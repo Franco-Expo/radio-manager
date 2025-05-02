@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FileText, Save, Trash2 } from "lucide-react";
+import { CalendarIcon, FileText, Trash2 } from "lucide-react";
 
 type Program = {
   id: string;
