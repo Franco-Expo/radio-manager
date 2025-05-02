@@ -57,12 +57,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        return { success: false, error: error.message };
+        // Traduciamo i messaggi di errore in italiano
+        let errorMessage: string;
+        
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Credenziali di accesso non valide";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Email non confermata";
+        } else if (error.message.includes("Invalid email")) {
+          errorMessage = "Email non valida";
+        } else if (error.message.includes("User not found")) {
+          errorMessage = "Utente non trovato";
+        } else {
+          errorMessage = "Errore durante l'accesso";
+        }
+        
+        return { success: false, error: errorMessage };
       }
 
       return { success: true };
     } catch (error: any) {
-      return { success: false, error: error.message || "An unknown error occurred" };
+      return { success: false, error: "Si è verificato un errore imprevisto" };
     } finally {
       setLoading(false);
     }
@@ -82,12 +97,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        return { success: false, error: error.message };
+        // Traduciamo i messaggi di errore in italiano
+        let errorMessage: string;
+        
+        if (error.message.includes("User already registered")) {
+          errorMessage = "L'utente è già registrato";
+        } else if (error.message.includes("Password should be at least")) {
+          errorMessage = "La password deve essere di almeno 6 caratteri";
+        } else if (error.message.includes("Email not confirmed")) {
+          errorMessage = "Email non confermata";
+        } else if (error.message.includes("Invalid email")) {
+          errorMessage = "Email non valida";
+        } else {
+          errorMessage = "Errore durante la registrazione";
+        }
+        
+        return { success: false, error: errorMessage };
       }
 
       return { success: true };
     } catch (error: any) {
-      return { success: false, error: error.message || "An unknown error occurred" };
+      return { success: false, error: "Si è verificato un errore imprevisto" };
     } finally {
       setLoading(false);
     }

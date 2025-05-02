@@ -49,7 +49,11 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
           <h3 className="text-sm font-medium mb-2">Pubblicazione</h3>
           <div className="space-y-1">
             {publishedPrograms.map((program) => (
-              <div key={`pub-${program.id}`} className="text-xs flex justify-between">
+              <div 
+                key={`pub-${program.id}`} 
+                className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
+                onClick={() => onProgramClick(program.id)}
+              >
                 <span>{program.name}</span>
                 <span className="text-muted-foreground">
                   {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
