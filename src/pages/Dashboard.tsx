@@ -35,6 +35,12 @@ const Dashboard = () => {
   };
   
   const handleUpdateProgram = (updatedProgram: Program) => {
+    // Special case for reset action
+    if (updatedProgram.id === 'reset') {
+      setSelectedProgramId(undefined);
+      return;
+    }
+    
     setPrograms(
       programs.map((p) => (p.id === updatedProgram.id ? updatedProgram : p))
     );

@@ -28,9 +28,10 @@ type TakeEditorProps = {
   takeNumber: number;
   onDelete: () => void;
   onSave: (takeId: string, songs: SongInfo[]) => void;
+  onSaveComplete?: () => void;
 };
 
-export function TakeEditor({ takeId, takeNumber, onDelete, onSave }: TakeEditorProps) {
+export function TakeEditor({ takeId, takeNumber, onDelete, onSave, onSaveComplete }: TakeEditorProps) {
   const [songs, setSongs] = useState<SongInfo[]>([
     { id: `song-${Date.now()}`, title: "", news: "" },
   ]);
@@ -65,6 +66,10 @@ export function TakeEditor({ takeId, takeNumber, onDelete, onSave }: TakeEditorP
       title: "Salvato",
       description: `Take ${takeNumber} salvata con successo`,
     });
+    
+    if (onSaveComplete) {
+      onSaveComplete();
+    }
   };
 
   return (

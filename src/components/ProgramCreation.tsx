@@ -125,6 +125,18 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
     });
   };
   
+  const handleReturnToNewProgram = () => {
+    // Clear the selected program to return to new program screen
+    // Il componente parent (Dashboard) gestirà questo cambio di stato
+    if (selectedProgramId) {
+      // Reset internal state
+      setTakes([]);
+      setActiveTake("take-0");
+      // Clear selected program in parent
+      onProgramUpdate({...selectedProgram!, id: 'reset'});
+    }
+  };
+  
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-center my-8">
@@ -183,6 +195,7 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
                   takeNumber={take.number}
                   onDelete={() => handleDeleteTake(take.id)}
                   onSave={handleSaveTake}
+                  onSaveComplete={handleReturnToNewProgram}
                 />
               </TabsContent>
             ))}
