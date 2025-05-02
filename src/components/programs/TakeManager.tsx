@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TakeEditor } from "@/components/takes/TakeEditor";
-import { Save } from "lucide-react";
+import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Take } from "@/types/takes";
 import type { Program } from "@/types/programs";
+import { ActionButtons } from "./ActionButtons";
+import { TabContents } from "./TabContents";
+import { TakeTab } from "./TakeTab";
 
 type TakeManagerProps = {
   takes: Take[];
@@ -85,9 +85,7 @@ export function TakeManager({
       <div className="flex items-center justify-between mb-2">
         <TabsList>
           {takes.map((take) => (
-            <TabsTrigger key={take.id} value={take.id}>
-              Take{String(take.number).padStart(2, '0')}
-            </TabsTrigger>
+            <TakeTab key={take.id} id={take.id} number={take.number} />
           ))}
         </TabsList>
         <ActionButtons 
@@ -104,56 +102,5 @@ export function TakeManager({
         onSaveComplete={onSaveComplete}
       />
     </Tabs>
-  );
-}
-
-type ActionButtonsProps = {
-  onAddTake: () => void;
-  onSaveProgram: () => void;
-};
-
-function ActionButtons({ onAddTake, onSaveProgram }: ActionButtonsProps) {
-  return (
-    <div className="flex space-x-2">
-      <Button variant="outline" onClick={onAddTake}>
-        Aggiungi Altra Take
-      </Button>
-      <Button 
-        variant="default" 
-        onClick={onSaveProgram}
-        className="flex items-center gap-2"
-      >
-        <Save className="h-4 w-4" />
-        Salva il Programma
-      </Button>
-    </div>
-  );
-}
-
-type TabContentsProps = {
-  takes: Take[];
-  activeTake: string | undefined;
-  onDeleteTake: (takeId: string) => void;
-  onSaveTake: (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => Promise<boolean>;
-  onSaveComplete: () => void;
-};
-
-function TabContents({ takes, activeTake, onDeleteTake, onSaveTake, onSaveComplete }: TabContentsProps) {
-  return (
-    <>
-      {takes.map((take) => (
-        <TabsContent key={take.id} value={take.id} className="mt-4">
-          <TakeEditor
-            takeId={take.id}
-            takeNumber={take.number}
-            initialSongs={take.songs}
-            initialDate={take.date}
-            onDelete={() => onDeleteTake(take.id)}
-            onSave={(songs, date) => onSaveTake(take.id, songs, date)}
-            onSaveComplete={onSaveComplete}
-          />
-        </TabsContent>
-      ))}
-    </>
   );
 }
