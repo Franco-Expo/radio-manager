@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
-import { Program } from '@/types/programs';
+import type { Program } from '@/types/programs';
 import {
   fetchPrograms as fetchProgramsService,
   createProgramInDB,
@@ -13,7 +13,7 @@ import {
   deleteProgramInDB
 } from '@/services/programService';
 
-export { Program };
+export type { Program };
 
 export function usePrograms() {
   const [programs, setPrograms] = useState<Program[]>([]);

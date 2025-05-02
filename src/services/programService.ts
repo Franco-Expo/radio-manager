@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { Program } from '@/types/programs';
+import type { Program } from '@/types/programs';
 
 export const fetchPrograms = async (): Promise<Program[]> => {
   const { data, error } = await supabase
