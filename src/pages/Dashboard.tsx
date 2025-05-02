@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Sidebar } from "@/components/Sidebar";
-import { ProgramCreation } from "@/components/ProgramCreation";
+import { ProgramCreation } from "@/components/programs/ProgramCreation";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
