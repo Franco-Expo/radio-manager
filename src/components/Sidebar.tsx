@@ -75,9 +75,9 @@ export function Sidebar({
       </div>
       
       {!isCollapsed && publishedPrograms.length > 0 && (
-        <div className="p-4 border-b">
+        <div className="p-4 border-b flex flex-col">
           <h3 className="text-sm font-medium mb-2">Pubblicazione</h3>
-          <ScrollArea className="h-auto max-h-[150px]">
+          <ScrollArea className="h-auto max-h-[25vh]">
             <div className="space-y-1 pr-2">
               {publishedPrograms.map((program) => (
                 <div 
@@ -100,7 +100,7 @@ export function Sidebar({
       )}
       
       {!isCollapsed && (
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col">
           <h3 
             className="text-sm font-medium mb-2 cursor-pointer flex items-center gap-2" 
             onClick={handleProgramsHeaderClick}
@@ -108,7 +108,7 @@ export function Sidebar({
             <Radio className="h-4 w-4" />
             <span>Programmi Radio</span>
           </h3>
-          <ScrollArea className="h-[calc(100vh-240px)]">
+          <ScrollArea className="flex-1">
             <div className="space-y-1 pr-2">
               {sortedPrograms.map((program) => (
                 <ProgramItem 
