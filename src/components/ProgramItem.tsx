@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FilePdf } from "lucide-react";
+import { CalendarIcon, FileText } from "lucide-react";
 
 type Program = {
   id: string;
@@ -75,7 +75,7 @@ export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, o
         <ContextMenuItem 
           onClick={() => onExportPdf(program.id)}
         >
-          <FilePdf className="mr-2 h-4 w-4" />
+          <FileText className="mr-2 h-4 w-4" />
           Salva come PDF
         </ContextMenuItem>
       </ContextMenuContent>

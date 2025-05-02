@@ -91,13 +91,13 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
   });
   
   // Add footer
-  const pageCount = doc.internal.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
+  const totalPages = doc.internal.pages.length - 1;
+  for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'italic');
     doc.text('Radio Manager Pro', margin, doc.internal.pageSize.getHeight() - 10);
-    doc.text(`Pagina ${i} di ${pageCount}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
+    doc.text(`Pagina ${i} di ${totalPages}`, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });
   }
   
   // Save the PDF
