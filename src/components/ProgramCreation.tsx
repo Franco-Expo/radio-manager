@@ -1,11 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TakeEditor } from "./TakeEditor";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Take } from "@/hooks/useTakes";
 
@@ -46,9 +46,11 @@ export function ProgramCreation({
     : undefined;
   
   // Set active take to first take if none selected and takes exist
-  if (takes.length > 0 && !activeTake) {
-    setActiveTake(takes[0].id);
-  }
+  useEffect(() => {
+    if (takes.length > 0 && !activeTake) {
+      setActiveTake(takes[0].id);
+    }
+  }, [takes, activeTake]);
   
   const handleCreateProgram = () => {
     if (newProgramName.trim() === "") {
@@ -132,6 +134,9 @@ export function ProgramCreation({
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Nuovo Programma Radiofonico</DialogTitle>
+              <DialogDescription>
+                Inserisci il nome del tuo nuovo programma radiofonico.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
