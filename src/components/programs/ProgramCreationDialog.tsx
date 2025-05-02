@@ -40,6 +40,7 @@ export function ProgramCreationDialog({ onProgramCreate }: ProgramCreationDialog
         description: `Il programma "${newProgramName}" è stato creato con successo`,
       });
     }
+    // We don't close the dialog in case of error to allow the user to correct the name
   };
 
   return (
