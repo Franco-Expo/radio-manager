@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Sidebar } from "@/components/Sidebar";
@@ -12,6 +12,7 @@ import { usePrograms } from "@/hooks/usePrograms";
 import type { Program } from '@/types/programs';
 import { useTakes } from "@/hooks/useTakes";
 import { Loader2 } from "lucide-react";
+import { toast as sonnerToast } from "sonner";
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
@@ -35,6 +36,16 @@ const Dashboard = () => {
     deleteTake
   } = useTakes(selectedProgramId);
   
+  // Debugging for selectedProgramId changes
+  useEffect(() => {
+    console.log("Selected program ID changed:", selectedProgramId);
+  }, [selectedProgramId]);
+
+  // Debugging for takes loading
+  useEffect(() => {
+    console.log("Takes updated:", takes);
+  }, [takes]);
+  
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/auth" />;
@@ -43,10 +54,12 @@ const Dashboard = () => {
   const handleCreateProgram = async (newProgram: { name: string; publishDate: Date | null }) => {
     const createdProgram = await createProgram(newProgram.name);
     if (createdProgram) {
+      console.log("Program created:", createdProgram);
       setSelectedProgramId(createdProgram.id);
       
       // Create first take
-      await createTake(1);
+      const firstTake = await createTake(1);
+      console.log("First take created:", firstTake);
     }
     
     return createdProgram;
@@ -61,7 +74,14 @@ const Dashboard = () => {
   };
   
   const handleProgramClick = (programId: string) => {
+    console.log("Program clicked with ID:", programId);
     setSelectedProgramId(programId);
+    
+    // Provide UI feedback
+    const program = programs.find(p => p.id === programId);
+    if (program) {
+      sonnerToast.success(`Programma selezionato: ${program.name}`);
+    }
   };
   
   const handleExportToPdf = (programId: string) => {

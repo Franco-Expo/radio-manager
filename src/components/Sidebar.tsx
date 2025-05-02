@@ -40,10 +40,15 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
   // Ordina i programmi per nome in ordine decrescente alfabetico (dalla Z alla A)
   const sortedPrograms = [...programs].sort((a, b) => b.name.localeCompare(a.name));
   
-  // Fix: Ensure we only attempt to click a program if there are programs available
+  // Improved handler with better logging and making sure a valid program ID is available
   const handleProgramsHeaderClick = () => {
+    console.log("Programmi Radio header clicked");
     if (sortedPrograms.length > 0) {
-      onProgramClick(sortedPrograms[0].id);
+      const programToSelect = sortedPrograms[0];
+      console.log(`Selecting program: ${programToSelect.name} with ID: ${programToSelect.id}`);
+      onProgramClick(programToSelect.id);
+    } else {
+      console.log("No programs available to select");
     }
   };
   
@@ -70,7 +75,10 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
                 <div 
                   key={`pub-${program.id}`} 
                   className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
-                  onClick={() => onProgramClick(program.id)}
+                  onClick={() => {
+                    console.log(`Clicking published program: ${program.name}`);
+                    onProgramClick(program.id);
+                  }}
                 >
                   <span>{program.name}</span>
                   <span className="text-muted-foreground">
@@ -98,7 +106,10 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
                 <ProgramItem 
                   key={program.id}
                   program={program}
-                  onClick={() => onProgramClick(program.id)}
+                  onClick={() => {
+                    console.log(`Clicking program: ${program.name}`);
+                    onProgramClick(program.id);
+                  }}
                   onDelete={() => onProgramDelete(program.id)}
                   onPublishDateChange={(date) => onPublishDateChange(program.id, date)}
                   onExportPdf={onExportPdf}
