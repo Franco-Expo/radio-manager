@@ -13,9 +13,16 @@ type SongListProps = {
   onSongChange: (id: string, field: "title" | "news", value: string) => void;
   onDeleteSong: (id: string) => void;
   onAddSong: () => void;
+  onClearSongContent?: (id: string) => void;
 };
 
-export function SongList({ songs, onSongChange, onDeleteSong, onAddSong }: SongListProps) {
+export function SongList({ 
+  songs, 
+  onSongChange, 
+  onDeleteSong, 
+  onAddSong,
+  onClearSongContent 
+}: SongListProps) {
   return (
     <div className="space-y-4">
       {songs.map((song) => (
@@ -26,6 +33,7 @@ export function SongList({ songs, onSongChange, onDeleteSong, onAddSong }: SongL
           news={song.news}
           onDelete={onDeleteSong}
           onChange={onSongChange}
+          onClearContent={onClearSongContent}
         />
       ))}
       

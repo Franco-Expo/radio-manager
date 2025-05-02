@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TrashIcon, Eraser } from "lucide-react";
 
 type SongItemProps = {
   id: string;
@@ -10,9 +11,20 @@ type SongItemProps = {
   news: string;
   onDelete: (id: string) => void;
   onChange: (id: string, field: "title" | "news", value: string) => void;
+  onClearContent?: (id: string) => void;
 };
 
-export function SongItem({ id, title, news, onDelete, onChange }: SongItemProps) {
+export function SongItem({ id, title, news, onDelete, onChange, onClearContent }: SongItemProps) {
+  const handleClearContent = () => {
+    if (onClearContent) {
+      onClearContent(id);
+    } else {
+      // Fallback if onClearContent is not provided
+      onChange(id, "title", "");
+      onChange(id, "news", "");
+    }
+  };
+
   return (
     <div className="space-y-4 p-4 border rounded-md relative">
       <div className="space-y-2">
@@ -38,14 +50,26 @@ export function SongItem({ id, title, news, onDelete, onChange }: SongItemProps)
         </div>
       </div>
       
-      <Button 
-        variant="destructive" 
-        size="sm" 
-        onClick={() => onDelete(id)}
-        className="absolute top-2 right-2"
-      >
-        Cancella
-      </Button>
+      <div className="absolute top-2 right-2 flex gap-2">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleClearContent}
+          title="Cancella contenuto"
+        >
+          <Eraser className="h-4 w-4" />
+          <span className="sr-only">Cancella contenuto</span>
+        </Button>
+        <Button 
+          variant="destructive" 
+          size="sm" 
+          onClick={() => onDelete(id)}
+          title="Elimina elemento"
+        >
+          <TrashIcon className="h-4 w-4" />
+          <span className="sr-only">Elimina</span>
+        </Button>
+      </div>
     </div>
   );
 }

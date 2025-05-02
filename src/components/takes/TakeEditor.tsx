@@ -70,6 +70,13 @@ export function TakeEditor({
     setSongs(songs.filter((song) => song.id !== id));
   };
   
+  const handleClearSongContent = (id: string) => {
+    setSongs(
+      songs.map((song) => (song.id === id ? { ...song, title: "", news: "" } : song))
+    );
+    sonnerToast.success("Contenuto cancellato");
+  };
+  
   const handleSave = async () => {
     const result = await onSave(songs, date);
     
@@ -100,6 +107,7 @@ export function TakeEditor({
           onSongChange={handleSongChange}
           onDeleteSong={handleDeleteSong}
           onAddSong={handleAddSong}
+          onClearSongContent={handleClearSongContent}
         />
       </CardContent>
       
