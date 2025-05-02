@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TakeEditor } from "@/components/TakeEditor";
+import { TakeEditor } from "@/components/takes/TakeEditor";
 import { Save } from "lucide-react";
 import type { Take } from "@/types/takes";
 import type { Program } from "@/types/programs";
