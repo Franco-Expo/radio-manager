@@ -5,7 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
 import { fetchTakes, createTake as createTakeService, updateTake as updateTakeService, deleteTake as deleteTakeService } from '@/services/takeService';
 
-export { Take } from '@/types/takes';
+// Change the re-export to use 'export type'
+export type { Take } from '@/types/takes';
 
 export function useTakes(programId: string | undefined) {
   const [takes, setTakes] = useState<Take[]>([]);
