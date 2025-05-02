@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 type User = {
@@ -84,6 +83,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem("radioManagerUser");
+    // After logout, redirect to auth page
+    window.location.href = "/auth";
   };
 
   return (
