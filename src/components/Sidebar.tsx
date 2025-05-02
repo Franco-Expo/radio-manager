@@ -77,8 +77,8 @@ export function Sidebar({
       {!isCollapsed && publishedPrograms.length > 0 && (
         <div className="p-4 border-b">
           <h3 className="text-sm font-medium mb-2">Pubblicazione</h3>
-          <ScrollArea className="h-auto max-h-[250px]">
-            <div className="space-y-1">
+          <ScrollArea className="h-auto max-h-[150px]">
+            <div className="space-y-1 pr-2">
               {publishedPrograms.map((program) => (
                 <div 
                   key={`pub-${program.id}`} 
