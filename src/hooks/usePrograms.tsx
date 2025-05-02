@@ -93,10 +93,13 @@ export function usePrograms() {
 
   const updateProgramPublishDate = async (programId: string, date: Date | null) => {
     try {
+      // Convertire la data in formato ISO string se esiste, altrimenti null
+      const isoDate = date ? date.toISOString() : null;
+      
       const { error } = await supabase
         .from('programs')
         .update({
-          publish_date: date,
+          publish_date: isoDate,
           updated_at: new Date().toISOString(),
         })
         .eq('id', programId);

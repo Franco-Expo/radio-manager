@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgramItem } from "./ProgramItem";
-import { Menu } from "lucide-react";
+import { Menu, Radio } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -62,7 +62,10 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
       
       {!isCollapsed && (
         <div className="p-4">
-          <h3 className="text-sm font-medium mb-2">Programmi Radio</h3>
+          <h3 className="text-sm font-medium mb-2 cursor-pointer flex items-center gap-2" onClick={() => programs.length > 0 && onProgramClick(programs[0]?.id)}>
+            <Radio className="h-4 w-4" />
+            <span>Programmi Radio</span>
+          </h3>
           <ScrollArea className="h-[calc(100vh-240px)]">
             <div className="space-y-1 pr-2">
               {programs.map((program) => (

@@ -102,7 +102,7 @@ export function ProgramCreation({
   };
   
   const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string }[]) => {
-    await onTakeUpdate(takeId, songs);
+    return await onTakeUpdate(takeId, songs);
   };
   
   const handleReturnToNewProgram = () => {
