@@ -84,6 +84,9 @@ export function TakeEditor({
       sonnerToast.success("Salvataggio completato", {
         description: "I dati sono stati salvati con successo"
       });
+      if (onSaveComplete) {
+        onSaveComplete();
+      }
     } else {
       sonnerToast.error("Errore durante il salvataggio", {
         description: "Si è verificato un errore durante il salvataggio dei dati"
