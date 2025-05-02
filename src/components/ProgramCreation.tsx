@@ -7,7 +7,7 @@ import { TakeEditor } from "./TakeEditor";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Take } from "@/hooks/useTakes";
+import { Take } from "@/types/takes";
 
 type Program = {
   id: string;
