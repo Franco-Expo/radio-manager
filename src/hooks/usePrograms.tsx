@@ -1,22 +1,19 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
+import { Program } from '@/types/programs';
+import {
+  fetchPrograms as fetchProgramsService,
+  createProgramInDB,
+  updateProgramPublishDateInDB,
+  saveProgramInDB,
+  deleteTakesAndSongsForProgram,
+  deleteProgramInDB
+} from '@/services/programService';
 
-export type Program = {
-  id: string;
-  name: string;
-  publishDate: Date | null;
-};
-
-export type Take = {
-  id: string;
-  number: number;
-  date?: Date;
-  songs: { id: string; title: string; news: string }[];
-};
+export { Program };
 
 export function usePrograms() {
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -33,23 +30,8 @@ export function usePrograms() {
   const fetchPrograms = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from('programs')
-        .select('*')
-        .order('updated_at', { ascending: false });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      // Transform data to match our Program type
-      const transformedPrograms = data.map(program => ({
-        id: program.id,
-        name: program.name,
-        publishDate: program.publish_date ? new Date(program.publish_date) : null,
-      }));
-
-      setPrograms(transformedPrograms);
+      const programsData = await fetchProgramsService();
+      setPrograms(programsData);
     } catch (error: any) {
       console.error('Error fetching programs:', error);
       toast({
@@ -68,7 +50,7 @@ export function usePrograms() {
 
   const createProgram = async (programName: string) => {
     try {
-      // Verifica che il nome del programma sia unico
+      // Verify program name is unique
       if (!isNameUnique(programName)) {
         toast({
           title: 'Errore',
@@ -78,21 +60,7 @@ export function usePrograms() {
         return null;
       }
 
-      const { data, error } = await supabase.from('programs').insert({
-        name: programName,
-        user_id: user?.id,
-      }).select().single();
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      const newProgram: Program = {
-        id: data.id,
-        name: data.name,
-        publishDate: data.publish_date ? new Date(data.publish_date) : null,
-      };
-
+      const newProgram = await createProgramInDB(programName, user?.id || '');
       setPrograms([newProgram, ...programs]);
       return newProgram;
     } catch (error: any) {
@@ -108,30 +76,15 @@ export function usePrograms() {
 
   const updateProgramPublishDate = async (programId: string, date: Date | null) => {
     try {
-      // Convertire la data in formato ISO string se esiste, altrimenti null
-      const isoDate = date ? date.toISOString() : null;
-      
-      // Trova il programma corrente per ottenere il nome
+      // Find the program to get its name
       const currentProgram = programs.find(p => p.id === programId);
       if (!currentProgram) {
         throw new Error("Programma non trovato");
       }
       
-      // Aggiorniamo sia la data di pubblicazione che il nome nel database
-      const { error } = await supabase
-        .from('programs')
-        .update({
-          name: currentProgram.name,
-          publish_date: isoDate,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', programId);
+      await updateProgramPublishDateInDB(programId, date, currentProgram.name);
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      // Aggiorniamo lo stato locale
+      // Update local state
       setPrograms(
         programs.map(p =>
           p.id === programId ? { ...p, publishDate: date } : p
@@ -147,50 +100,13 @@ export function usePrograms() {
 
   const deleteProgram = async (programId: string) => {
     try {
-      // Prima eliminiamo tutte le takes associate al programma
-      // Otteniamo tutte le takes per il programma
-      const { data: takesData, error: takesError } = await supabase
-        .from('takes')
-        .select('id')
-        .eq('program_id', programId);
+      // First delete all related takes and songs
+      await deleteTakesAndSongsForProgram(programId);
+      
+      // Then delete the program itself
+      await deleteProgramInDB(programId);
 
-      if (takesError) {
-        throw new Error(takesError.message);
-      }
-
-      // Per ogni take, eliminiamo tutte le songs associate
-      for (const take of takesData) {
-        // Eliminiamo tutte le canzoni associate alla take
-        const { error: songsError } = await supabase
-          .from('songs')
-          .delete()
-          .eq('take_id', take.id);
-
-        if (songsError) {
-          throw new Error(songsError.message);
-        }
-      }
-
-      // Ora eliminiamo tutte le takes
-      const { error: deleteTakesError } = await supabase
-        .from('takes')
-        .delete()
-        .eq('program_id', programId);
-
-      if (deleteTakesError) {
-        throw new Error(deleteTakesError.message);
-      }
-
-      // Infine, eliminiamo il programma stesso
-      const { error } = await supabase
-        .from('programs')
-        .delete()
-        .eq('id', programId);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
+      // Update local state
       setPrograms(programs.filter(p => p.id !== programId));
       sonnerToast.success('Programma eliminato con successo');
     } catch (error: any) {
@@ -205,26 +121,13 @@ export function usePrograms() {
 
   const saveProgram = async (programId: string) => {
     try {
-      // Trova il programma corrente
+      // Find the program
       const currentProgram = programs.find(p => p.id === programId);
       if (!currentProgram) {
         throw new Error("Programma non trovato");
       }
       
-      // Aggiorniamo il nome e la data di pubblicazione nel database
-      const { error } = await supabase
-        .from('programs')
-        .update({
-          name: currentProgram.name,
-          publish_date: currentProgram.publishDate ? currentProgram.publishDate.toISOString() : null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', programId);
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
+      await saveProgramInDB(programId, currentProgram.name, currentProgram.publishDate);
       sonnerToast.success('Programma salvato con successo');
     } catch (error: any) {
       console.error('Error saving program:', error);

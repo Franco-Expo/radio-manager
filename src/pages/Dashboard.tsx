@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -8,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { generateProgramPdf } from "@/utils/pdfGenerator";
-import { usePrograms } from "@/hooks/usePrograms";
+import { usePrograms, Program } from "@/hooks/usePrograms";
 import { useTakes } from "@/hooks/useTakes";
 import { Loader2 } from "lucide-react";
 
