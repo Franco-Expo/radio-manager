@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,8 +62,22 @@ export function usePrograms() {
     }
   };
 
+  const isNameUnique = (name: string): boolean => {
+    return !programs.some(program => program.name.toLowerCase() === name.toLowerCase());
+  };
+
   const createProgram = async (programName: string) => {
     try {
+      // Verifica che il nome del programma sia unico
+      if (!isNameUnique(programName)) {
+        toast({
+          title: 'Errore',
+          description: 'Esiste già un programma con questo nome. Scegli un nome diverso.',
+          variant: 'destructive',
+        });
+        return null;
+      }
+
       const { data, error } = await supabase.from('programs').insert({
         name: programName,
         user_id: user?.id,

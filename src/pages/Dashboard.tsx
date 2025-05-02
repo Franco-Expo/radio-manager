@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -47,6 +46,8 @@ const Dashboard = () => {
       // Create first take
       await createTake(1);
     }
+    
+    return createdProgram;
   };
   
   const handleUpdateProgram = (updatedProgram: { id: string; name: string; publishDate: Date | null }) => {

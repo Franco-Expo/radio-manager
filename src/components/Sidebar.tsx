@@ -37,8 +37,8 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
       return 0;
     });
   
-  // Ordina i programmi per ID in ordine crescente (dal più recente al più vecchio)
-  const sortedPrograms = [...programs].sort((a, b) => a.id.localeCompare(b.id));
+  // Ordina i programmi per nome in ordine crescente alfabetico (dalla A alla Z)
+  const sortedPrograms = [...programs].sort((a, b) => a.name.localeCompare(b.name));
   
   return (
     <div className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full ${isCollapsed ? 'w-16' : 'w-64'}`}>

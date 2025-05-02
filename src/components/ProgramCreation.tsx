@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ type Program = {
 type ProgramCreationProps = {
   programs: Program[];
   takes: Take[];
-  onProgramCreate: (program: Omit<Program, "id">) => void;
+  onProgramCreate: (program: Omit<Program, "id">) => Promise<Program | null>;
   onProgramUpdate: (program: Program) => void;
   selectedProgramId?: string;
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
@@ -55,7 +54,7 @@ export function ProgramCreation({
     }
   }, [takes, activeTake]);
   
-  const handleCreateProgram = () => {
+  const handleCreateProgram = async () => {
     if (newProgramName.trim() === "") {
       toast({
         title: "Errore",
@@ -65,18 +64,21 @@ export function ProgramCreation({
       return;
     }
     
-    onProgramCreate({
+    const createdProgram = await onProgramCreate({
       name: newProgramName,
       publishDate: null,
     });
     
-    setIsDialogOpen(false);
-    setNewProgramName("");
-    
-    toast({
-      title: "Programma creato",
-      description: `Il programma "${newProgramName}" è stato creato con successo`,
-    });
+    if (createdProgram) {
+      setIsDialogOpen(false);
+      setNewProgramName("");
+      
+      toast({
+        title: "Programma creato",
+        description: `Il programma "${newProgramName}" è stato creato con successo`,
+      });
+    }
+    // Non chiudiamo il dialog in caso di errore per permettere all'utente di correggere il nome
   };
   
   const handleAddTake = async () => {
@@ -150,7 +152,7 @@ export function ProgramCreation({
             <DialogHeader>
               <DialogTitle>Nuovo Programma Radiofonico</DialogTitle>
               <DialogDescription>
-                Inserisci il nome del tuo nuovo programma radiofonico.
+                Inserisci il nome del tuo nuovo programma radiofonico. Il nome deve essere unico.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
