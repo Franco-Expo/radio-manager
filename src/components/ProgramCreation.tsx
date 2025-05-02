@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,9 +136,28 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
     }
   };
   
+  const loadSavedProgram = (programId: string) => {
+    // For now, we're just creating a default take
+    // In a real app, you'd fetch the saved takes from a database
+    if (!takes.length) {
+      setTakes([{ id: "take-0", number: 1, songs: [{ id: `song-${Date.now()}`, title: "", news: "" }] }]);
+      setActiveTake("take-0");
+    }
+  };
+  
+  // Load saved program when selectedProgramId changes
+  if (selectedProgramId && !takes.length) {
+    loadSavedProgram(selectedProgramId);
+  }
+  
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-center my-8">
+      <div className="flex flex-col justify-center items-center my-8">
+        {!selectedProgram && (
+          <p className="text-center text-lg mb-4 max-w-md">
+            Crea la tua Playlist con le informazioni musicali e le ultime notizie
+          </p>
+        )}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="lg" className="text-lg py-6">

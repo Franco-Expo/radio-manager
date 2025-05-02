@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Sidebar } from "@/components/Sidebar";
@@ -7,12 +7,22 @@ import { ProgramCreation } from "@/components/ProgramCreation";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { generateProgramPdf } from "@/utils/pdfGenerator";
 
 type Program = {
   id: string;
   name: string;
   publishDate: Date | null;
 };
+
+type Take = {
+  id: string;
+  number: number;
+  songs: { id: string; title: string; news: string }[];
+};
+
+// In-memory storage for takes (in a real app, this would be in a database)
+const programTakes: Record<string, Take[]> = {};
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
@@ -32,6 +42,9 @@ const Dashboard = () => {
     };
     setPrograms([...programs, program]);
     setSelectedProgramId(program.id);
+    
+    // Initialize program takes
+    programTakes[program.id] = [];
   };
   
   const handleUpdateProgram = (updatedProgram: Program) => {
@@ -53,6 +66,11 @@ const Dashboard = () => {
       setSelectedProgramId(undefined);
     }
     
+    // Remove program takes
+    if (programTakes[programId]) {
+      delete programTakes[programId];
+    }
+    
     toast({
       title: "Programma eliminato",
       description: "Il programma è stato eliminato con successo",
@@ -71,6 +89,36 @@ const Dashboard = () => {
     );
   };
   
+  const handleExportToPdf = (programId: string) => {
+    const program = programs.find(p => p.id === programId);
+    if (!program) return;
+    
+    // Get takes for the program (or use empty array if none exist)
+    const takes = programTakes[programId] || [];
+    
+    try {
+      generateProgramPdf(program, takes);
+      toast({
+        title: "PDF generato",
+        description: `Il programma "${program.name}" è stato salvato come PDF`,
+      });
+    } catch (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante la generazione del PDF",
+        variant: "destructive",
+      });
+      console.error("PDF generation error:", error);
+    }
+  };
+  
+  // Save takes to our in-memory storage
+  const handleSaveTakes = (programId: string, takes: Take[]) => {
+    if (programId) {
+      programTakes[programId] = [...takes];
+    }
+  };
+  
   return (
     <div className="flex flex-col h-screen">
       <Header />
@@ -80,6 +128,7 @@ const Dashboard = () => {
           onProgramClick={handleProgramClick}
           onProgramDelete={handleDeleteProgram}
           onPublishDateChange={handlePublishDateChange}
+          onExportPdf={handleExportToPdf}
         />
         <main className="flex-1 overflow-y-auto">
           <ProgramCreation

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, FilePdf } from "lucide-react";
 
 type Program = {
   id: string;
@@ -28,9 +28,10 @@ type ProgramItemProps = {
   onClick: () => void;
   onDelete: () => void;
   onPublishDateChange: (date: Date | null) => void;
+  onExportPdf: (programId: string) => void;
 };
 
-export function ProgramItem({ program, onClick, onDelete, onPublishDateChange }: ProgramItemProps) {
+export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, onExportPdf }: ProgramItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   return (
@@ -70,6 +71,12 @@ export function ProgramItem({ program, onClick, onDelete, onPublishDateChange }:
           onClick={onDelete}
         >
           Cancella
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={() => onExportPdf(program.id)}
+        >
+          <FilePdf className="mr-2 h-4 w-4" />
+          Salva come PDF
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

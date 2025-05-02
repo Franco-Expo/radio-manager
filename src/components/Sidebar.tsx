@@ -17,9 +17,10 @@ type SidebarProps = {
   onProgramClick: (programId: string) => void;
   onProgramDelete: (programId: string) => void;
   onPublishDateChange: (programId: string, date: Date | null) => void;
+  onExportPdf: (programId: string) => void;
 };
 
-export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDateChange }: SidebarProps) {
+export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDateChange, onExportPdf }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   const toggleSidebar = () => {
@@ -71,6 +72,7 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
                   onClick={() => onProgramClick(program.id)}
                   onDelete={() => onProgramDelete(program.id)}
                   onPublishDateChange={(date) => onPublishDateChange(program.id, date)}
+                  onExportPdf={onExportPdf}
                 />
               ))}
             </div>
