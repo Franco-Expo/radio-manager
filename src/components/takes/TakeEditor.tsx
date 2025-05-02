@@ -21,7 +21,7 @@ type TakeEditorProps = {
   initialDate?: Date;
   onDelete: () => void;
   onSave: (songs: SongInfo[], date: Date) => Promise<boolean>;
-  onSaveComplete?: () => void;
+  onSaveComplete?: () => void; // Made optional, won't be called after successful save
 };
 
 export function TakeEditor({ 
@@ -84,9 +84,7 @@ export function TakeEditor({
       sonnerToast.success("Salvataggio completato", {
         description: "I dati sono stati salvati con successo"
       });
-      if (onSaveComplete) {
-        onSaveComplete();
-      }
+      // Removed the onSaveComplete call here to prevent page navigation
     } else {
       sonnerToast.error("Errore durante il salvataggio", {
         description: "Si è verificato un errore durante il salvataggio dei dati"
