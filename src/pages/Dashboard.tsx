@@ -22,7 +22,8 @@ const Dashboard = () => {
     isLoading: programsLoading, 
     createProgram, 
     updateProgramPublishDate, 
-    deleteProgram 
+    deleteProgram,
+    saveProgram
   } = usePrograms();
   
   const {
@@ -121,6 +122,7 @@ const Dashboard = () => {
               onTakeCreate={createTake}
               onTakeUpdate={updateTake}
               onTakeDelete={deleteTake}
+              onProgramSave={saveProgram}
             />
           )}
         </main>

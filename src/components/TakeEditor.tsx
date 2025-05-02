@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +26,7 @@ type TakeEditorProps = {
   takeNumber: number;
   initialSongs: SongInfo[];
   onDelete: () => void;
-  onSave: (songs: SongInfo[]) => Promise<boolean>;
+  onSave: (songs: SongInfo[], date: Date) => Promise<boolean>;
   onSaveComplete?: () => void;
 };
 
@@ -69,11 +69,10 @@ export function TakeEditor({
   };
   
   const handleSave = async () => {
-    const result = await onSave(songs);
+    const result = await onSave(songs, date);
     
     if (result) {
-      // Success - don't call onSaveComplete to stay on the page
-      // Just show a success toast in Italian
+      // Mostriamo un messaggio di conferma in italiano
       toast({
         title: "Salvataggio completato",
         description: "I dati sono stati salvati con successo nel database",
@@ -153,7 +152,10 @@ export function TakeEditor({
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={onDelete}>Cancella Take</Button>
-          <Button variant="default" onClick={handleSave}>Salva</Button>
+          <Button variant="default" onClick={handleSave} className="flex items-center gap-2">
+            <Save className="h-4 w-4" />
+            Salva
+          </Button>
         </div>
       </CardFooter>
     </Card>

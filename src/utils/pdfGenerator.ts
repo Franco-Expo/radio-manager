@@ -11,6 +11,7 @@ type Take = {
   id: string;
   number: number;
   songs: Song[];
+  date?: Date;
 };
 
 type Program = {
@@ -27,7 +28,7 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
   const titleFontSize = 18;
   const headingFontSize = 14;
   const normalFontSize = 11;
-  const smallFontSize = 9;
+  const smallFontSize = 11;  // Cambiato a 11pt come richiesto
   
   // Set document properties
   doc.setProperties({
@@ -61,8 +62,18 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
     // Take title
     doc.setFontSize(headingFontSize);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Take ${String(take.number).padStart(2, '0')}`, margin, yPosition);
-    yPosition += 10;
+    const takeTitle = `Take ${String(take.number).padStart(2, '0')}`;
+    doc.text(takeTitle, margin, yPosition);
+    
+    // Aggiungiamo la data della take se disponibile
+    if (take.date) {
+      doc.setFontSize(smallFontSize);
+      doc.setFont('helvetica', 'italic');
+      const takeDate = `Data: ${new Date(take.date).toLocaleDateString('it-IT')}`;
+      doc.text(takeDate, pageWidth - margin - doc.getStringUnitWidth(takeDate) * smallFontSize / doc.internal.scaleFactor, yPosition);
+    }
+    
+    yPosition += 8;
     
     // Add songs
     take.songs.forEach((song, songIndex) => {
@@ -86,8 +97,12 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
       yPosition += textLines.length * 5 + 10;
     });
     
-    // Add space between takes
-    yPosition += 5;
+    // Add separator line between takes
+    if (takeIndex < takes.length - 1) {
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
+    }
   });
   
   // Add footer

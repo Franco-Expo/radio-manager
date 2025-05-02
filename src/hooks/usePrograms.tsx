@@ -14,6 +14,7 @@ export type Program = {
 export type Take = {
   id: string;
   number: number;
+  date?: Date;
   songs: { id: string; title: string; news: string }[];
 };
 
@@ -52,8 +53,8 @@ export function usePrograms() {
     } catch (error: any) {
       console.error('Error fetching programs:', error);
       toast({
-        title: 'Error',
-        description: 'Could not load programs',
+        title: 'Errore',
+        description: 'Impossibile caricare i programmi',
         variant: 'destructive',
       });
     } finally {
@@ -83,8 +84,8 @@ export function usePrograms() {
     } catch (error: any) {
       console.error('Error creating program:', error);
       toast({
-        title: 'Error',
-        description: 'Could not create program',
+        title: 'Errore',
+        description: 'Impossibile creare il programma',
         variant: 'destructive',
       });
       return null;
@@ -114,30 +115,89 @@ export function usePrograms() {
         )
       );
 
-      sonnerToast.success('Publish date updated successfully');
+      sonnerToast.success('Data di pubblicazione aggiornata con successo');
     } catch (error: any) {
       console.error('Error updating program publish date:', error);
-      sonnerToast.error('Could not update publish date');
+      sonnerToast.error('Impossibile aggiornare la data di pubblicazione');
     }
   };
 
   const deleteProgram = async (programId: string) => {
     try {
-      const { error } = await supabase.from('programs').delete().eq('id', programId);
+      // Prima eliminiamo tutte le takes associate al programma
+      // Otteniamo tutte le takes per il programma
+      const { data: takesData, error: takesError } = await supabase
+        .from('takes')
+        .select('id')
+        .eq('program_id', programId);
+
+      if (takesError) {
+        throw new Error(takesError.message);
+      }
+
+      // Per ogni take, eliminiamo tutte le songs associate
+      for (const take of takesData) {
+        // Eliminiamo tutte le canzoni associate alla take
+        const { error: songsError } = await supabase
+          .from('songs')
+          .delete()
+          .eq('take_id', take.id);
+
+        if (songsError) {
+          throw new Error(songsError.message);
+        }
+      }
+
+      // Ora eliminiamo tutte le takes
+      const { error: deleteTakesError } = await supabase
+        .from('takes')
+        .delete()
+        .eq('program_id', programId);
+
+      if (deleteTakesError) {
+        throw new Error(deleteTakesError.message);
+      }
+
+      // Infine, eliminiamo il programma stesso
+      const { error } = await supabase
+        .from('programs')
+        .delete()
+        .eq('id', programId);
 
       if (error) {
         throw new Error(error.message);
       }
 
       setPrograms(programs.filter(p => p.id !== programId));
-      sonnerToast.success('Program deleted successfully');
+      sonnerToast.success('Programma eliminato con successo');
     } catch (error: any) {
       console.error('Error deleting program:', error);
       toast({
-        title: 'Error',
-        description: 'Could not delete program',
+        title: 'Errore',
+        description: 'Impossibile eliminare il programma',
         variant: 'destructive',
       });
+    }
+  };
+
+  const saveProgram = async (programId: string) => {
+    try {
+      // Aggiorniamo l'updated_at del programma per segnare che è stato salvato
+      const { error } = await supabase
+        .from('programs')
+        .update({
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', programId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      sonnerToast.success('Programma salvato con successo');
+    } catch (error: any) {
+      console.error('Error saving program:', error);
+      sonnerToast.error('Impossibile salvare il programma');
     }
   };
 
@@ -147,6 +207,7 @@ export function usePrograms() {
     createProgram,
     updateProgramPublishDate,
     deleteProgram,
+    saveProgram,
     refreshPrograms: fetchPrograms,
   };
 }

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FileText } from "lucide-react";
+import { CalendarIcon, FileText, Save, Trash2 } from "lucide-react";
 
 type Program = {
   id: string;
@@ -33,6 +33,12 @@ type ProgramItemProps = {
 
 export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, onExportPdf }: ProgramItemProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  const handleDelete = () => {
+    if (confirm("Sei sicuro di voler cancellare questo programma e tutte le sue take?")) {
+      onDelete();
+    }
+  };
   
   return (
     <ContextMenu>
@@ -67,15 +73,17 @@ export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, o
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem 
-          className="text-destructive focus:text-destructive" 
-          onClick={onDelete}
+          className="text-destructive focus:text-destructive flex items-center gap-2" 
+          onClick={handleDelete}
         >
+          <Trash2 className="h-4 w-4" />
           Cancella
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onExportPdf(program.id)}
+          className="flex items-center gap-2"
         >
-          <FileText className="mr-2 h-4 w-4" />
+          <FileText className="h-4 w-4" />
           Salva come PDF
         </ContextMenuItem>
       </ContextMenuContent>

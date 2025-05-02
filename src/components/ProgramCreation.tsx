@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Take } from "@/types/takes";
+import { Save } from "lucide-react";
 
 type Program = {
   id: string;
@@ -22,8 +23,9 @@ type ProgramCreationProps = {
   onProgramUpdate: (program: Program) => void;
   selectedProgramId?: string;
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
-  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string }[]) => Promise<boolean>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => Promise<boolean>;
   onTakeDelete: (takeId: string) => Promise<void>;
+  onProgramSave: (programId: string) => Promise<void>;
 };
 
 export function ProgramCreation({
@@ -34,7 +36,8 @@ export function ProgramCreation({
   selectedProgramId,
   onTakeCreate,
   onTakeUpdate,
-  onTakeDelete
+  onTakeDelete,
+  onProgramSave
 }: ProgramCreationProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newProgramName, setNewProgramName] = useState("");
@@ -103,8 +106,18 @@ export function ProgramCreation({
     }
   };
   
-  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string }[]) => {
-    return await onTakeUpdate(takeId, songs);
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => {
+    return await onTakeUpdate(takeId, songs, date);
+  };
+  
+  const handleSaveProgram = async () => {
+    if (selectedProgramId) {
+      await onProgramSave(selectedProgramId);
+      toast({
+        title: "Programma salvato",
+        description: "Il programma è stato salvato con successo nel database",
+      });
+    }
   };
   
   const handleReturnToNewProgram = () => {
@@ -171,9 +184,19 @@ export function ProgramCreation({
                   </TabsTrigger>
                 ))}
               </TabsList>
-              <Button variant="outline" onClick={handleAddTake}>
-                Aggiungi Altra Take
-              </Button>
+              <div className="flex space-x-2">
+                <Button variant="outline" onClick={handleAddTake}>
+                  Aggiungi Altra Take
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleSaveProgram}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  Salva il Programma
+                </Button>
+              </div>
             </div>
             
             {takes.map((take) => (
@@ -183,7 +206,7 @@ export function ProgramCreation({
                   takeNumber={take.number}
                   initialSongs={take.songs}
                   onDelete={() => handleDeleteTake(take.id)}
-                  onSave={(songs) => handleSaveTake(take.id, songs)}
+                  onSave={(songs, date) => handleSaveTake(take.id, songs, date)}
                   onSaveComplete={handleReturnToNewProgram}
                 />
               </TabsContent>

@@ -32,6 +32,7 @@ export async function fetchTakes(programId: string): Promise<Take[]> {
     takesWithSongs.push({
       id: take.id,
       number: take.number,
+      date: take.date ? new Date(take.date) : new Date(),
       songs: songsData.map(song => ({
         id: song.id,
         title: song.title,
@@ -49,12 +50,13 @@ export async function fetchTakes(programId: string): Promise<Take[]> {
 export async function createTake(programId: string, number: number): Promise<Take | null> {
   if (!programId) return null;
 
-  // Create the take
+  // Create the take with the current date
   const { data: takeData, error: takeError } = await supabase
     .from('takes')
     .insert({
       program_id: programId,
       number: number,
+      date: new Date().toISOString()
     })
     .select()
     .single();
@@ -77,6 +79,7 @@ export async function createTake(programId: string, number: number): Promise<Tak
   const newTake: Take = {
     id: takeData.id,
     number: takeData.number,
+    date: takeData.date ? new Date(takeData.date) : new Date(),
     songs: [{
       id: songData.id,
       title: songData.title,
@@ -90,7 +93,18 @@ export async function createTake(programId: string, number: number): Promise<Tak
 /**
  * Updates all songs for a take (deletes existing songs and creates new ones)
  */
-export async function updateTake(takeId: string, songs: Song[]): Promise<boolean> {
+export async function updateTake(takeId: string, songs: Song[], date: Date): Promise<boolean> {
+  // Aggiorniamo prima la data della take
+  const { error: updateTakeError } = await supabase
+    .from('takes')
+    .update({ 
+      date: date.toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', takeId);
+  
+  if (updateTakeError) throw new Error(updateTakeError.message);
+  
   // Delete all existing songs for this take
   const { error: deleteError } = await supabase
     .from('songs')

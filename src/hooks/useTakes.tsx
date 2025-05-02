@@ -30,8 +30,8 @@ export function useTakes(programId: string | undefined) {
     } catch (error: any) {
       console.error('Error fetching takes:', error);
       toast({
-        title: 'Error',
-        description: 'Could not load takes',
+        title: 'Errore',
+        description: 'Impossibile caricare le take',
         variant: 'destructive',
       });
     } finally {
@@ -49,28 +49,29 @@ export function useTakes(programId: string | undefined) {
     } catch (error: any) {
       console.error('Error creating take:', error);
       toast({
-        title: 'Error',
-        description: 'Could not create take',
+        title: 'Errore',
+        description: 'Impossibile creare la take',
         variant: 'destructive',
       });
       return null;
     }
   };
 
-  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string }[]) => {
+  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => {
     try {
-      const success = await updateTakeService(takeId, songs);
+      // Passiamo la data al servizio di aggiornamento take
+      const success = await updateTakeService(takeId, songs, date);
       if (success) {
-        // Update local state
+        // Aggiorniamo lo stato locale
         setTakes(takes.map(take => 
-          take.id === takeId ? { ...take, songs } : take
+          take.id === takeId ? { ...take, songs, date } : take
         ));
-        sonnerToast.success('Take saved successfully');
+        sonnerToast.success('Take salvata con successo');
       }
       return success;
     } catch (error: any) {
       console.error('Error updating take:', error);
-      sonnerToast.error('Could not save take');
+      sonnerToast.error('Impossibile salvare la take');
       return false;
     }
   };
@@ -79,12 +80,12 @@ export function useTakes(programId: string | undefined) {
     try {
       const updatedTakes = await deleteTakeService(takeId, takes);
       setTakes(updatedTakes);
-      sonnerToast.success('Take deleted successfully');
+      sonnerToast.success('Take eliminata con successo');
     } catch (error: any) {
       console.error('Error deleting take:', error);
       toast({
-        title: 'Error',
-        description: 'Could not delete take',
+        title: 'Errore',
+        description: 'Impossibile eliminare la take',
         variant: 'destructive',
       });
     }
