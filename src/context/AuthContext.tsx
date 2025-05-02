@@ -1,17 +1,15 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
 
-type User = {
-  id: string;
-  username: string;
-  email: string;
-};
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Session, User } from "@supabase/supabase-js";
 
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, username: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
   loading: boolean;
 };
 
@@ -27,64 +25,77 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user exists in localStorage
-    const storedUser = localStorage.getItem("radioManagerUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // In a real app, this would be an API call
-    // For demo purposes, we'll simulate a successful login
-    setLoading(true);
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser = {
-        id: "user_" + Date.now(),
-        username: email.split("@")[0],
-        email
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem("radioManagerUser", JSON.stringify(mockUser));
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || "An unknown error occurred" };
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
-    // In a real app, this would be an API call
-    // For demo purposes, we'll simulate a successful registration
-    setLoading(true);
+  const register = async (email: string, password: string, username: string) => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser = {
-        id: "user_" + Date.now(),
-        username,
-        email
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem("radioManagerUser", JSON.stringify(mockUser));
+      setLoading(true);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+          },
+        },
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || "An unknown error occurred" };
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("radioManagerUser");
-    // After logout, redirect to auth page
-    window.location.href = "/auth";
+  const logout = async () => {
+    await supabase.auth.signOut();
+    // After logout, the onAuthStateChange listener will update the state
   };
 
   return (
@@ -92,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         isAuthenticated: !!user,
         user,
+        session,
         login,
         register,
         logout,

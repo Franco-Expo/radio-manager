@@ -2,95 +2,108 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+
+const formSchema = z.object({
+  email: z.string().email({ message: "Email non valida" }),
+  password: z.string().min(6, { message: "La password deve avere almeno 6 caratteri" }),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 type LoginFormProps = {
-  onSwitchToRegister: () => void;
+  onSuccess?: () => void;
 };
 
-export function LoginForm({ onSwitchToRegister }: LoginFormProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, loading } = useAuth();
-  const { toast } = useToast();
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      await login(email, password);
-      toast({
-        title: "Accesso effettuato",
-        description: "Benvenuto su Radio Manager Pro",
-      });
-    } catch (error) {
-      toast({
-        title: "Errore di accesso",
-        description: "Credenziali non valide",
-        variant: "destructive",
-      });
+export function LoginForm({ onSuccess }: LoginFormProps) {
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function onSubmit(data: FormData) {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    const { success, error } = await login(data.email, data.password);
+
+    if (!success) {
+      setErrorMessage(error || "Errore durante l'accesso. Verifica email e password.");
+      setIsLoading(false);
+      return;
     }
-  };
-  
+
+    if (onSuccess) {
+      onSuccess();
+    }
+  }
+
   return (
-    <Card className="w-full md:max-w-md card-shadow">
-      <CardHeader>
-        <CardTitle className="text-center text-2xl">Accedi al tuo Account</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="login-user">User</Label>
-            <Input 
-              id="login-user" 
-              placeholder="Il tuo nome utente"
-              disabled={loading} 
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="login-email">Indirizzo mail</Label>
-            <Input 
-              id="login-email" 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="nome@esempio.com"
-              disabled={loading}
-              required 
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="login-password">Password</Label>
-            <Input 
-              id="login-password" 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              disabled={loading}
-              required 
-            />
-          </div>
-          <Button 
-            type="submit" 
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? "Accesso in corso..." : "Accedi"}
+    <div className="space-y-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="la-tua-email@esempio.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="••••••••" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {errorMessage && (
+            <div className="text-sm text-destructive">{errorMessage}</div>
+          )}
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Accesso in corso...
+              </>
+            ) : (
+              "Accedi"
+            )}
           </Button>
-          <div className="text-center mt-4">
-            <span className="text-sm text-muted-foreground">
-              Non hai un account?{" "}
-              <Button variant="link" className="p-0 h-auto" onClick={onSwitchToRegister} disabled={loading}>
-                Registrati
-              </Button>
-            </span>
-          </div>
         </form>
-      </CardContent>
-    </Card>
+      </Form>
+    </div>
   );
 }

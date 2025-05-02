@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { TakeEditor } from "./TakeEditor";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Take } from "@/hooks/useTakes";
 
 type Program = {
   id: string;
@@ -13,29 +15,40 @@ type Program = {
   publishDate: Date | null;
 };
 
-type Take = {
-  id: string;
-  number: number;
-  songs: { id: string; title: string; news: string }[];
-};
-
 type ProgramCreationProps = {
   programs: Program[];
+  takes: Take[];
   onProgramCreate: (program: Omit<Program, "id">) => void;
   onProgramUpdate: (program: Program) => void;
   selectedProgramId?: string;
+  onTakeCreate: (takeNumber: number) => Promise<Take | null>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string }[]) => Promise<boolean>;
+  onTakeDelete: (takeId: string) => Promise<void>;
 };
 
-export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, selectedProgramId }: ProgramCreationProps) {
+export function ProgramCreation({
+  programs,
+  takes,
+  onProgramCreate,
+  onProgramUpdate,
+  selectedProgramId,
+  onTakeCreate,
+  onTakeUpdate,
+  onTakeDelete
+}: ProgramCreationProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newProgramName, setNewProgramName] = useState("");
-  const [activeTake, setActiveTake] = useState("take-0");
-  const [takes, setTakes] = useState<Take[]>([]);
+  const [activeTake, setActiveTake] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   
   const selectedProgram = selectedProgramId 
     ? programs.find(p => p.id === selectedProgramId) 
     : undefined;
+  
+  // Set active take to first take if none selected and takes exist
+  if (takes.length > 0 && !activeTake) {
+    setActiveTake(takes[0].id);
+  }
   
   const handleCreateProgram = () => {
     if (newProgramName.trim() === "") {
@@ -55,33 +68,22 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
     setIsDialogOpen(false);
     setNewProgramName("");
     
-    // Create first take
-    setTakes([{ id: "take-0", number: 1, songs: [{ id: `song-${Date.now()}`, title: "", news: "" }] }]);
-    setActiveTake("take-0");
-    
     toast({
       title: "Programma creato",
       description: `Il programma "${newProgramName}" è stato creato con successo`,
     });
   };
   
-  const handleAddTake = () => {
+  const handleAddTake = async () => {
     const newTakeNumber = takes.length + 1;
-    const newTakeId = `take-${Date.now()}`;
+    const newTake = await onTakeCreate(newTakeNumber);
     
-    setTakes([
-      ...takes,
-      { 
-        id: newTakeId, 
-        number: newTakeNumber, 
-        songs: [{ id: `song-${Date.now()}`, title: "", news: "" }]
-      }
-    ]);
-    
-    setActiveTake(newTakeId);
+    if (newTake) {
+      setActiveTake(newTake.id);
+    }
   };
   
-  const handleDeleteTake = (takeId: string) => {
+  const handleDeleteTake = async (takeId: string) => {
     if (takes.length <= 1) {
       toast({
         title: "Impossibile eliminare",
@@ -91,64 +93,27 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
       return;
     }
     
-    const updatedTakes = takes.filter(t => t.id !== takeId);
-    setTakes(updatedTakes);
-    
-    // Update take numbers
-    const renumberedTakes = updatedTakes.map((take, idx) => ({
-      ...take,
-      number: idx + 1
-    }));
-    
-    setTakes(renumberedTakes);
+    await onTakeDelete(takeId);
     
     // Set active take to first one if the active take was deleted
-    if (takeId === activeTake && renumberedTakes.length > 0) {
-      setActiveTake(renumberedTakes[0].id);
+    if (takeId === activeTake && takes.length > 0) {
+      setActiveTake(takes[0].id);
     }
   };
   
-  const handleSaveTake = (takeId: string, songs: { id: string; title: string; news: string }[]) => {
-    setTakes(
-      takes.map(take => 
-        take.id === takeId ? { ...take, songs } : take
-      )
-    );
-  };
-  
-  const handleSaveAll = () => {
-    // In a real app, this would send data to a backend
-    toast({
-      title: "Salvato",
-      description: "Tutte le take sono state salvate con successo",
-    });
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string }[]) => {
+    await onTakeUpdate(takeId, songs);
   };
   
   const handleReturnToNewProgram = () => {
     // Clear the selected program to return to new program screen
-    // Il componente parent (Dashboard) gestirà questo cambio di stato
     if (selectedProgramId) {
       // Reset internal state
-      setTakes([]);
-      setActiveTake("take-0");
+      setActiveTake(undefined);
       // Clear selected program in parent
       onProgramUpdate({...selectedProgram!, id: 'reset'});
     }
   };
-  
-  const loadSavedProgram = (programId: string) => {
-    // For now, we're just creating a default take
-    // In a real app, you'd fetch the saved takes from a database
-    if (!takes.length) {
-      setTakes([{ id: "take-0", number: 1, songs: [{ id: `song-${Date.now()}`, title: "", news: "" }] }]);
-      setActiveTake("take-0");
-    }
-  };
-  
-  // Load saved program when selectedProgramId changes
-  if (selectedProgramId && !takes.length) {
-    loadSavedProgram(selectedProgramId);
-  }
   
   return (
     <div className="flex flex-col h-full">
@@ -211,19 +176,14 @@ export function ProgramCreation({ programs, onProgramCreate, onProgramUpdate, se
                 <TakeEditor
                   takeId={take.id}
                   takeNumber={take.number}
+                  initialSongs={take.songs}
                   onDelete={() => handleDeleteTake(take.id)}
-                  onSave={handleSaveTake}
+                  onSave={(songs) => handleSaveTake(take.id, songs)}
                   onSaveComplete={handleReturnToNewProgram}
                 />
               </TabsContent>
             ))}
           </Tabs>
-          
-          <div className="flex justify-end mt-8">
-            <Button size="lg" onClick={handleSaveAll}>
-              Salva Tutto
-            </Button>
-          </div>
         </div>
       )}
     </div>

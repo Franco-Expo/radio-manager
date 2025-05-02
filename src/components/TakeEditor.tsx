@@ -13,8 +13,6 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-
-// For WYSIWYG editor
 import { useToast } from "@/hooks/use-toast";
 
 type SongInfo = {
@@ -26,15 +24,25 @@ type SongInfo = {
 type TakeEditorProps = {
   takeId: string;
   takeNumber: number;
+  initialSongs: SongInfo[];
   onDelete: () => void;
-  onSave: (takeId: string, songs: SongInfo[]) => void;
+  onSave: (songs: SongInfo[]) => Promise<boolean>;
   onSaveComplete?: () => void;
 };
 
-export function TakeEditor({ takeId, takeNumber, onDelete, onSave, onSaveComplete }: TakeEditorProps) {
-  const [songs, setSongs] = useState<SongInfo[]>([
-    { id: `song-${Date.now()}`, title: "", news: "" },
-  ]);
+export function TakeEditor({ 
+  takeId, 
+  takeNumber, 
+  initialSongs, 
+  onDelete, 
+  onSave, 
+  onSaveComplete 
+}: TakeEditorProps) {
+  const [songs, setSongs] = useState<SongInfo[]>(
+    initialSongs.length > 0 
+      ? initialSongs 
+      : [{ id: `song-${Date.now()}`, title: "", news: "" }]
+  );
   const [date, setDate] = useState<Date>(new Date());
   const { toast } = useToast();
   
@@ -60,14 +68,10 @@ export function TakeEditor({ takeId, takeNumber, onDelete, onSave, onSaveComplet
     setSongs(songs.filter((song) => song.id !== id));
   };
   
-  const handleSave = () => {
-    onSave(takeId, songs);
-    toast({
-      title: "Salvato",
-      description: `Take ${takeNumber} salvata con successo`,
-    });
+  const handleSave = async () => {
+    const result = await onSave(songs);
     
-    if (onSaveComplete) {
+    if (result && onSaveComplete) {
       onSaveComplete();
     }
   };

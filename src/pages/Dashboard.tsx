@@ -8,93 +8,61 @@ import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { generateProgramPdf } from "@/utils/pdfGenerator";
-
-type Program = {
-  id: string;
-  name: string;
-  publishDate: Date | null;
-};
-
-type Take = {
-  id: string;
-  number: number;
-  songs: { id: string; title: string; news: string }[];
-};
-
-// In-memory storage for takes (in a real app, this would be in a database)
-const programTakes: Record<string, Take[]> = {};
+import { usePrograms } from "@/hooks/usePrograms";
+import { useTakes } from "@/hooks/useTakes";
+import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
-  const [programs, setPrograms] = useState<Program[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   
+  const { 
+    programs, 
+    isLoading: programsLoading, 
+    createProgram, 
+    updateProgramPublishDate, 
+    deleteProgram 
+  } = usePrograms();
+  
+  const {
+    takes,
+    isLoading: takesLoading,
+    createTake,
+    updateTake,
+    deleteTake
+  } = useTakes(selectedProgramId);
+  
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/auth" />;
   }
-  
-  const handleCreateProgram = (newProgram: Omit<Program, "id">) => {
-    const program = {
-      ...newProgram,
-      id: `program-${Date.now()}`,
-    };
-    setPrograms([...programs, program]);
-    setSelectedProgramId(program.id);
-    
-    // Initialize program takes
-    programTakes[program.id] = [];
+
+  const handleCreateProgram = async (newProgram: { name: string; publishDate: Date | null }) => {
+    const createdProgram = await createProgram(newProgram.name);
+    if (createdProgram) {
+      setSelectedProgramId(createdProgram.id);
+      
+      // Create first take
+      await createTake(1);
+    }
   };
   
-  const handleUpdateProgram = (updatedProgram: Program) => {
+  const handleUpdateProgram = (updatedProgram: { id: string; name: string; publishDate: Date | null }) => {
     // Special case for reset action
     if (updatedProgram.id === 'reset') {
       setSelectedProgramId(undefined);
       return;
     }
-    
-    setPrograms(
-      programs.map((p) => (p.id === updatedProgram.id ? updatedProgram : p))
-    );
-  };
-  
-  const handleDeleteProgram = (programId: string) => {
-    setPrograms(programs.filter((p) => p.id !== programId));
-    
-    if (selectedProgramId === programId) {
-      setSelectedProgramId(undefined);
-    }
-    
-    // Remove program takes
-    if (programTakes[programId]) {
-      delete programTakes[programId];
-    }
-    
-    toast({
-      title: "Programma eliminato",
-      description: "Il programma è stato eliminato con successo",
-    });
   };
   
   const handleProgramClick = (programId: string) => {
     setSelectedProgramId(programId);
   };
   
-  const handlePublishDateChange = (programId: string, date: Date | null) => {
-    setPrograms(
-      programs.map((p) => 
-        p.id === programId ? { ...p, publishDate: date } : p
-      )
-    );
-  };
-  
   const handleExportToPdf = (programId: string) => {
     const program = programs.find(p => p.id === programId);
     if (!program) return;
-    
-    // Get takes for the program (or use empty array if none exist)
-    const takes = programTakes[programId] || [];
     
     try {
       generateProgramPdf(program, takes);
@@ -112,12 +80,19 @@ const Dashboard = () => {
     }
   };
   
-  // Save takes to our in-memory storage
-  const handleSaveTakes = (programId: string, takes: Take[]) => {
-    if (programId) {
-      programTakes[programId] = [...takes];
-    }
-  };
+  // Show loading state
+  if (programsLoading) {
+    return (
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2">Caricamento programmi...</span>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   return (
     <div className="flex flex-col h-screen">
@@ -126,17 +101,28 @@ const Dashboard = () => {
         <Sidebar
           programs={programs}
           onProgramClick={handleProgramClick}
-          onProgramDelete={handleDeleteProgram}
-          onPublishDateChange={handlePublishDateChange}
+          onProgramDelete={deleteProgram}
+          onPublishDateChange={updateProgramPublishDate}
           onExportPdf={handleExportToPdf}
         />
         <main className="flex-1 overflow-y-auto">
-          <ProgramCreation
-            programs={programs}
-            onProgramCreate={handleCreateProgram}
-            onProgramUpdate={handleUpdateProgram}
-            selectedProgramId={selectedProgramId}
-          />
+          {takesLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-2">Caricamento takes...</span>
+            </div>
+          ) : (
+            <ProgramCreation
+              programs={programs}
+              takes={takes}
+              onProgramCreate={handleCreateProgram}
+              onProgramUpdate={handleUpdateProgram}
+              selectedProgramId={selectedProgramId}
+              onTakeCreate={createTake}
+              onTakeUpdate={updateTake}
+              onTakeDelete={deleteTake}
+            />
+          )}
         </main>
       </div>
       <Footer />
