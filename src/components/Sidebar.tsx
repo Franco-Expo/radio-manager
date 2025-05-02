@@ -40,6 +40,13 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
   // Ordina i programmi per nome in ordine decrescente alfabetico (dalla Z alla A)
   const sortedPrograms = [...programs].sort((a, b) => b.name.localeCompare(a.name));
   
+  // Fix: Ensure we only attempt to click a program if there are programs available
+  const handleProgramsHeaderClick = () => {
+    if (sortedPrograms.length > 0) {
+      onProgramClick(sortedPrograms[0].id);
+    }
+  };
+  
   return (
     <div className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full ${isCollapsed ? 'w-16' : 'w-64'}`}>
       <div className="p-4 border-b flex items-center justify-between bg-sidebar">
@@ -78,7 +85,10 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
       
       {!isCollapsed && (
         <div className="p-4">
-          <h3 className="text-sm font-medium mb-2 cursor-pointer flex items-center gap-2" onClick={() => sortedPrograms.length > 0 && onProgramClick(sortedPrograms[0]?.id)}>
+          <h3 
+            className="text-sm font-medium mb-2 cursor-pointer flex items-center gap-2" 
+            onClick={handleProgramsHeaderClick}
+          >
             <Radio className="h-4 w-4" />
             <span>Programmi Radio</span>
           </h3>
