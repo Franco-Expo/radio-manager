@@ -84,6 +84,30 @@ const Dashboard = () => {
     }
   };
   
+  const handleCreateTake = async (programId: string) => {
+    console.log("Creating new take for program ID:", programId);
+    
+    // First select the program
+    setSelectedProgramId(programId);
+    
+    // Find the highest take number to create the next one
+    const programTakes = takes.filter(take => take.number);
+    const nextTakeNumber = programTakes.length > 0 
+      ? Math.max(...programTakes.map(take => take.number)) + 1 
+      : 1;
+    
+    try {
+      const newTake = await createTake(nextTakeNumber);
+      if (newTake) {
+        sonnerToast.success(`Nuova Take ${nextTakeNumber} creata`);
+        console.log("New take created:", newTake);
+      }
+    } catch (error) {
+      console.error("Error creating new take:", error);
+      sonnerToast.error("Errore nella creazione della nuova take");
+    }
+  };
+  
   const handleExportToPdf = (programId: string) => {
     const program = programs.find(p => p.id === programId);
     if (!program) return;
@@ -128,6 +152,7 @@ const Dashboard = () => {
           onProgramDelete={deleteProgram}
           onPublishDateChange={updateProgramPublishDate}
           onExportPdf={handleExportToPdf}
+          onCreateTake={handleCreateTake}
         />
         <main className="flex-1 overflow-y-auto">
           {takesLoading ? (

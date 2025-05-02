@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FileText, Trash2 } from "lucide-react";
+import { CalendarIcon, FileText, FilePlus, Trash2 } from "lucide-react";
 
 type Program = {
   id: string;
@@ -29,14 +29,29 @@ type ProgramItemProps = {
   onDelete: () => void;
   onPublishDateChange: (date: Date | null) => void;
   onExportPdf: (programId: string) => void;
+  onCreateTake?: (programId: string) => void;
 };
 
-export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, onExportPdf }: ProgramItemProps) {
+export function ProgramItem({ 
+  program, 
+  onClick, 
+  onDelete, 
+  onPublishDateChange, 
+  onExportPdf,
+  onCreateTake 
+}: ProgramItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   const handleDelete = () => {
     if (confirm("Sei sicuro di voler cancellare questo programma e tutte le sue take?")) {
       onDelete();
+    }
+  };
+
+  const handleCreateTake = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onCreateTake) {
+      onCreateTake(program.id);
     }
   };
   
@@ -73,11 +88,11 @@ export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, o
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem 
-          className="text-destructive focus:text-destructive flex items-center gap-2" 
-          onClick={handleDelete}
+          onClick={handleCreateTake}
+          className="flex items-center gap-2"
         >
-          <Trash2 className="h-4 w-4" />
-          Cancella
+          <FilePlus className="h-4 w-4" />
+          Crea nuova Take
         </ContextMenuItem>
         <ContextMenuItem 
           onClick={() => onExportPdf(program.id)}
@@ -85,6 +100,13 @@ export function ProgramItem({ program, onClick, onDelete, onPublishDateChange, o
         >
           <FileText className="h-4 w-4" />
           Salva come PDF
+        </ContextMenuItem>
+        <ContextMenuItem 
+          className="text-destructive focus:text-destructive flex items-center gap-2" 
+          onClick={handleDelete}
+        >
+          <Trash2 className="h-4 w-4" />
+          Cancella
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
