@@ -74,6 +74,7 @@ export type Database = {
       takes: {
         Row: {
           created_at: string
+          date: string | null
           id: string
           number: number
           program_id: string
@@ -81,6 +82,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          date?: string | null
           id?: string
           number: number
           program_id: string
@@ -88,6 +90,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          date?: string | null
           id?: string
           number?: number
           program_id?: string

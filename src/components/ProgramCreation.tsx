@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -205,6 +204,7 @@ export function ProgramCreation({
                   takeId={take.id}
                   takeNumber={take.number}
                   initialSongs={take.songs}
+                  initialDate={take.date}
                   onDelete={() => handleDeleteTake(take.id)}
                   onSave={(songs, date) => handleSaveTake(take.id, songs, date)}
                   onSaveComplete={handleReturnToNewProgram}

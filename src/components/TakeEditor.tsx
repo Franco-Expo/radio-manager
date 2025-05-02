@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,8 @@ import { CalendarIcon, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { it } from "date-fns/locale";
+import { toast as sonnerToast } from 'sonner';
 
 type SongInfo = {
   id: string;
@@ -25,6 +27,7 @@ type TakeEditorProps = {
   takeId: string;
   takeNumber: number;
   initialSongs: SongInfo[];
+  initialDate?: Date;
   onDelete: () => void;
   onSave: (songs: SongInfo[], date: Date) => Promise<boolean>;
   onSaveComplete?: () => void;
@@ -33,7 +36,8 @@ type TakeEditorProps = {
 export function TakeEditor({ 
   takeId, 
   takeNumber, 
-  initialSongs, 
+  initialSongs,
+  initialDate,
   onDelete, 
   onSave, 
   onSaveComplete 
@@ -43,8 +47,15 @@ export function TakeEditor({
       ? initialSongs 
       : [{ id: `song-${Date.now()}`, title: "", news: "" }]
   );
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(initialDate || new Date());
   const { toast } = useToast();
+  
+  // Aggiorniamo la data quando cambia initialDate
+  useEffect(() => {
+    if (initialDate) {
+      setDate(initialDate);
+    }
+  }, [initialDate]);
   
   const handleAddSong = () => {
     setSongs([...songs, { id: `song-${Date.now()}`, title: "", news: "" }]);
@@ -73,9 +84,12 @@ export function TakeEditor({
     
     if (result) {
       // Mostriamo un messaggio di conferma in italiano
-      toast({
-        title: "Salvataggio completato",
-        description: "I dati sono stati salvati con successo nel database",
+      sonnerToast.success("Salvataggio completato", {
+        description: "I dati sono stati salvati con successo"
+      });
+    } else {
+      sonnerToast.error("Errore durante il salvataggio", {
+        description: "Si è verificato un errore durante il salvataggio dei dati"
       });
     }
   };
@@ -104,6 +118,7 @@ export function TakeEditor({
                 selected={date}
                 onSelect={(date) => date && setDate(date)}
                 initialFocus
+                locale={it}
               />
             </PopoverContent>
           </Popover>

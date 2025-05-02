@@ -8,6 +8,6 @@ export interface Song {
 export interface Take {
   id: string;
   number: number;
-  date?: Date;
+  date: Date;  // Modificato da opzionale a obbligatorio
   songs: Song[];
 }
