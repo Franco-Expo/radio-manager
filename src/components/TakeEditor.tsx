@@ -71,8 +71,13 @@ export function TakeEditor({
   const handleSave = async () => {
     const result = await onSave(songs);
     
-    if (result && onSaveComplete) {
-      onSaveComplete();
+    if (result) {
+      // Success - don't call onSaveComplete to stay on the page
+      // Just show a success toast in Italian
+      toast({
+        title: "Salvataggio completato",
+        description: "I dati sono stati salvati con successo nel database",
+      });
     }
   };
 
