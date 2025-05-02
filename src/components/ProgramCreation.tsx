@@ -116,6 +116,8 @@ export function ProgramCreation({
         title: "Programma salvato",
         description: "Il programma è stato salvato con successo nel database",
       });
+      // Dopo il salvataggio, chiudi la pagina delle take tornando alla schermata iniziale
+      handleReturnToNewProgram();
     }
   };
   

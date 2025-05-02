@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -97,9 +96,17 @@ export function usePrograms() {
       // Convertire la data in formato ISO string se esiste, altrimenti null
       const isoDate = date ? date.toISOString() : null;
       
+      // Trova il programma corrente per ottenere il nome
+      const currentProgram = programs.find(p => p.id === programId);
+      if (!currentProgram) {
+        throw new Error("Programma non trovato");
+      }
+      
+      // Aggiorniamo sia la data di pubblicazione che il nome nel database
       const { error } = await supabase
         .from('programs')
         .update({
+          name: currentProgram.name,
           publish_date: isoDate,
           updated_at: new Date().toISOString(),
         })
@@ -109,6 +116,7 @@ export function usePrograms() {
         throw new Error(error.message);
       }
 
+      // Aggiorniamo lo stato locale
       setPrograms(
         programs.map(p =>
           p.id === programId ? { ...p, publishDate: date } : p
@@ -182,10 +190,18 @@ export function usePrograms() {
 
   const saveProgram = async (programId: string) => {
     try {
-      // Aggiorniamo l'updated_at del programma per segnare che è stato salvato
+      // Trova il programma corrente
+      const currentProgram = programs.find(p => p.id === programId);
+      if (!currentProgram) {
+        throw new Error("Programma non trovato");
+      }
+      
+      // Aggiorniamo il nome e la data di pubblicazione nel database
       const { error } = await supabase
         .from('programs')
         .update({
+          name: currentProgram.name,
+          publish_date: currentProgram.publishDate ? currentProgram.publishDate.toISOString() : null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', programId);
