@@ -28,7 +28,7 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
   const titleFontSize = 18;
   const headingFontSize = 14;
   const normalFontSize = 11;
-  const smallFontSize = 11;  // Cambiato a 11pt come richiesto
+  const smallFontSize = 11;
   
   // Set document properties
   doc.setProperties({
@@ -41,12 +41,12 @@ export const generateProgramPdf = (program: Program, takes: Take[]): void => {
   doc.setFont('helvetica', 'bold');
   doc.text(program.name, pageWidth / 2, margin, { align: 'center' });
   
-  // Add date
+  // Add publication date
   doc.setFontSize(smallFontSize);
   doc.setFont('helvetica', 'normal');
   const dateText = program.publishDate 
-    ? `Data di pubblicazione: ${new Date(program.publishDate).toLocaleDateString('it-IT')}`
-    : `Creato il: ${new Date().toLocaleDateString('it-IT')}`;
+    ? `Data di Pubblicazione: ${new Date(program.publishDate).toLocaleDateString('it-IT')}`
+    : "Pubblicazione del programma non registrata";
   doc.text(dateText, pageWidth / 2, margin + 8, { align: 'center' });
   
   let yPosition = margin + 20;

@@ -37,7 +37,7 @@ export function Sidebar({ programs, onProgramClick, onProgramDelete, onPublishDa
       return 0;
     });
   
-  // Ordina tutti i programmi in ordine crescente (dal basso verso l'alto mostreremo quelli con ID più basso)
+  // Ordina i programmi per ID in ordine crescente (dal più recente al più vecchio)
   const sortedPrograms = [...programs].sort((a, b) => a.id.localeCompare(b.id));
   
   return (
