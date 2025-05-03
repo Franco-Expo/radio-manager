@@ -24,7 +24,7 @@ export const PAGE_HEIGHT = 297; // A4 height in mm
 export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARGINS.bottom;
 
 // Line height to be used for calculations
-export const LINE_HEIGHT = 3;
+export const LINE_HEIGHT = 5;
 
 // Line number from bottom for forced page break (40 lines from bottom - changed from 49)
 export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (20 * LINE_HEIGHT);
