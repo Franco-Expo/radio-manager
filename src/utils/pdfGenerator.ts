@@ -88,6 +88,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   // Sort takes by number
   const sortedTakes = [...takes].sort((a, b) => a.number - b.number);
   
+  if (sortedTakes.length === 0) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Nessun take disponibile per questo programma", 40, y);
+  }
+  
   // Loop through each take
   for (const take of sortedTakes) {
     // Check if we need a new page
@@ -116,6 +123,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       return a.id.localeCompare(b.id);
     });
     
+    if (sortedSongs.length === 0) {
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(100, 100, 100);
+      doc.text("Nessuna canzone in questa take", 40, y);
+      y += 8;
+    }
+    
     // Reset text color for songs
     doc.setTextColor(60, 60, 60);
     
@@ -132,7 +146,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       // Song title with font size 11pt
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(`${i + 1}. ${song.title}`, 40, y);
+      doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, 40, y);
       y += 6;
       
       // Add news with font size 11pt
@@ -144,6 +158,12 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         const splitText = doc.splitTextToSize(song.news, 150);
         doc.text(splitText, 50, y);
         y += 6 * Math.min(splitText.length, 1) + (splitText.length > 1 ? 3 : 0);
+      } else {
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(120, 120, 120);
+        doc.text("Nessuna notizia", 50, y);
+        y += 6;
       }
       
       // Add a single line separation between songs (but not after the last song)

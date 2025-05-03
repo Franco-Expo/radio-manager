@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -110,21 +109,49 @@ const Dashboard = () => {
   
   const handleExportToPdf = (programId: string) => {
     const program = programs.find(p => p.id === programId);
-    if (!program) return;
-    
-    try {
-      generateProgramPdf(program, takes);
-      toast({
-        title: "PDF generato",
-        description: `Il programma "${program.name}" è stato salvato come PDF`,
-      });
-    } catch (error) {
+    if (!program) {
       toast({
         title: "Errore",
-        description: "Si è verificato un errore durante la generazione del PDF",
+        description: "Programma non trovato",
         variant: "destructive",
       });
-      console.error("PDF generation error:", error);
+      return;
+    }
+    
+    // Make sure we have the takes for this specific program
+    if (selectedProgramId !== programId) {
+      setSelectedProgramId(programId);
+      setTimeout(() => {
+        try {
+          generateProgramPdf(program, takes);
+          toast({
+            title: "PDF generato",
+            description: `Il programma "${program.name}" è stato salvato come PDF`,
+          });
+        } catch (error) {
+          toast({
+            title: "Errore",
+            description: "Si è verificato un errore durante la generazione del PDF",
+            variant: "destructive",
+          });
+          console.error("PDF generation error:", error);
+        }
+      }, 1000); // Give time for the takes to load
+    } else {
+      try {
+        generateProgramPdf(program, takes);
+        toast({
+          title: "PDF generato",
+          description: `Il programma "${program.name}" è stato salvato come PDF`,
+        });
+      } catch (error) {
+        toast({
+          title: "Errore",
+          description: "Si è verificato un errore durante la generazione del PDF",
+          variant: "destructive",
+        });
+        console.error("PDF generation error:", error);
+      }
     }
   };
   
