@@ -27,7 +27,7 @@ export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARG
 export const LINE_HEIGHT = 3;
 
 // Line number from bottom for forced page break (40 lines from bottom - changed from 49)
-//export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (20 * LINE_HEIGHT);
+export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (20 * LINE_HEIGHT);
 
 // Configure document properties
 export function setupDocumentProperties(doc: jsPDF, options: {
