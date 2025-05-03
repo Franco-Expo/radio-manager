@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 
 // Constants for document styling
@@ -25,8 +26,8 @@ export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARG
 // Line height to be used for calculations
 export const LINE_HEIGHT = 5;
 
-// Line number from bottom for forced page break (49 lines from bottom)
-export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (49 * LINE_HEIGHT);
+// Line number from bottom for forced page break (40 lines from bottom - changed from 49)
+export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (40 * LINE_HEIGHT);
 
 // Configure document properties
 export function setupDocumentProperties(doc: jsPDF, options: {
