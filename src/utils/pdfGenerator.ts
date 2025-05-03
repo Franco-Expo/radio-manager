@@ -11,16 +11,37 @@ export type Program = {
 export function generateProgramPdf(program: Program, takes: Take[]) {
   const doc = new jsPDF();
   
+  // Set document properties
+  doc.setProperties({
+    title: `Programma ${program.name}`,
+    subject: 'Radio Program Schedule',
+    author: 'Radio Manager',
+    creator: 'Radio Manager App'
+  });
+  
   // Set up initial position
   let y = 20;
   
-  // Add program title
-  doc.setFontSize(20);
-  doc.text(program.name, 20, y);
+  // Add program title with improved styling
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  
+  // Calculate center position for title
+  const titleWidth = doc.getStringUnitWidth(program.name) * 24 / doc.internal.scaleFactor;
+  const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
+  
+  doc.text(program.name, titleX, y);
+  y += 15;
+  
+  // Add divider line
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.5);
+  doc.line(20, y, 190, y);
   y += 10;
   
   // Add publication date
   doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
   doc.text(
     "Data di Pubblicazione: " + (program.publishDate 
       ? new Date(program.publishDate).toLocaleDateString('it-IT') 
@@ -28,25 +49,36 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     20, 
     y
   );
-  y += 15;
-  
-  // Add date
-  doc.setFontSize(12);
-  doc.text(`Programma generato il: ${new Date().toLocaleDateString('it-IT')}`, 20, y);
   y += 10;
+  
+  // Add generation date
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "italic");
+  doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 20, y);
+  y += 15;
   
   // Sort takes by number
   const sortedTakes = [...takes].sort((a, b) => a.number - b.number);
   
   // Loop through each take
   for (const take of sortedTakes) {
-    y += 10;
+    // Check if we need a new page
+    if (y > 250) {
+      doc.addPage();
+      y = 20;
+    }
+    
+    // Add take header with improved styling
     doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(60, 60, 60);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, 20, y);
     y += 8;
     
     if (take.date) {
-      doc.setFontSize(12);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(100, 100, 100);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 25, y);
       y += 10;
     }
@@ -55,6 +87,9 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     const sortedSongs = [...take.songs].sort((a, b) => {
       return a.id.localeCompare(b.id);
     });
+    
+    // Reset text color for songs
+    doc.setTextColor(0, 0, 0);
     
     // Loop through each song
     for (const song of sortedSongs) {
@@ -65,17 +100,34 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       }
       
       doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
       doc.text(`Brano: ${song.title}`, 30, y);
       y += 8;
       
-      // Add news with word wrap
+      // Add news with word wrap and styled
       if (song.news && song.news.trim()) {
         doc.setFontSize(12);
-        const splitText = doc.splitTextToSize(`News: ${song.news}`, 160);
-        doc.text(splitText, 35, y);
-        y += 8 * splitText.length;
+        doc.setFont("helvetica", "normal");
+        
+        // Add a light gray background for news
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(35, y - 4, 160, 8 * (doc.splitTextToSize(song.news, 150).length) + 6, 3, 3, 'F');
+        
+        const splitText = doc.splitTextToSize(`News: ${song.news}`, 150);
+        doc.text(splitText, 40, y);
+        y += 8 * splitText.length + 5;
+      } else {
+        y += 5;
       }
-      
+    }
+    
+    // Add a divider between takes
+    if (sortedSongs.length > 0) {
+      doc.setDrawColor(220, 220, 220);
+      doc.setLineWidth(0.3);
+      doc.line(20, y, 190, y);
+      y += 10;
+    } else {
       y += 5;
     }
   }

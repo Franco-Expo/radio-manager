@@ -35,12 +35,12 @@ export function Sidebar({
     setIsCollapsed(!isCollapsed);
   };
   
-  // Ordina i programmi pubblicati per data di pubblicazione in ordine crescente
+  // Sort published programs by publication date in descending order (newest first)
   const publishedPrograms = programs
     .filter(p => p.publishDate)
     .sort((a, b) => {
       if (a.publishDate && b.publishDate) {
-        return a.publishDate.getTime() - b.publishDate.getTime();
+        return b.publishDate.getTime() - a.publishDate.getTime();
       }
       return 0;
     });
@@ -77,8 +77,8 @@ export function Sidebar({
       {!isCollapsed && publishedPrograms.length > 0 && (
         <div className="p-4 border-b flex flex-col">
           <h3 className="text-sm font-medium mb-2">Pubblicazione</h3>
-          <ScrollArea className="h-auto max-h-[25vh] overflow-auto pr-2">
-            <div className="space-y-1">
+          <ScrollArea className="h-auto max-h-[25vh] pr-2">
+            <div className="space-y-1 pr-2">
               {publishedPrograms.map((program) => (
                 <div 
                   key={`pub-${program.id}`} 
@@ -108,7 +108,7 @@ export function Sidebar({
             <Radio className="h-4 w-4" />
             <span>Programmi Radio</span>
           </h3>
-          <ScrollArea className="flex-1 overflow-auto">
+          <ScrollArea className="flex-1 pr-2">
             <div className="space-y-1 pr-2">
               {sortedPrograms.map((program) => (
                 <ProgramItem 
