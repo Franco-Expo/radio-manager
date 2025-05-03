@@ -46,14 +46,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   // Set up initial position
   let y = 30;
   
-  // Modern header with program title
-  doc.setFillColor(155, 135, 245); // Modern light purple
-  doc.rect(0, 0, doc.internal.pageSize.width, 15, 'F');
+  // Set font size to 11pt as requested
+  doc.setFontSize(11);
   
   // Add program title with modern styling
-  doc.setFontSize(26);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(50, 50, 50);
+  doc.setFontSize(26);
   
   // Calculate center position for title
   const titleWidth = doc.getStringUnitWidth(program.name) * 26 / doc.internal.scaleFactor;
@@ -97,9 +96,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       y = 30;
     }
     
-    // Add take header with modern styling
-    doc.setFillColor(211, 228, 253); // Soft blue
-    doc.rect(20, y - 5, doc.internal.pageSize.width - 40, 10, 'F');
+    // Add take header with simple styling (no background)
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(70, 70, 70);
@@ -132,13 +129,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         y = 30;
       }
       
-      // Song title with modern styling
+      // Song title with font size 11pt
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.text(`${i + 1}. ${song.title}`, 40, y);
       y += 6;
       
-      // Add news with modern styling
+      // Add news with font size 11pt
       if (song.news && song.news.trim()) {
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
@@ -149,12 +146,12 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         y += 6 * Math.min(splitText.length, 1) + (splitText.length > 1 ? 3 : 0);
       }
       
-      // Add thin line separator between songs (but not after the last song)
+      // Add a single line separation between songs (but not after the last song)
       if (i < sortedSongs.length - 1) {
         doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.2);
         doc.line(50, y + 1, 160, y + 1);
-        y += 5; // Just 1 line of separation
+        y += 5; // Just 1 line of separation as requested
       }
     }
     
