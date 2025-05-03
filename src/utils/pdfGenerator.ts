@@ -6,7 +6,7 @@ import { setupDocumentProperties, addFooter } from './pdf/documentStyles';
 import { addProgramHeader } from './pdf/headerSection';
 import { renderTakes } from './pdf/takeSection';
 
-export { Program } from './pdf/types';
+export type { Program } from './pdf/types';
 
 export function generateProgramPdf(program: Program, takes: Take[]) {
   // Create a new PDF document
