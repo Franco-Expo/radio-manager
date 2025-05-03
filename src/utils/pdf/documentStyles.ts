@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 
 // Constants for document styling
 export const DOCUMENT_MARGINS = {
-  top: 20,
+  top: 10,
   bottom: 20,
   left: 20,
   right: 20
@@ -20,7 +20,7 @@ export const FONT_SIZES = {
 
 // Page dimensions
 export const PAGE_WIDTH = 210; // A4 width in mm
-export const PAGE_HEIGHT = 280; // A4 height in mm
+export const PAGE_HEIGHT = 297; // A4 height in mm
 export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARGINS.bottom;
 
 // Line height to be used for calculations
