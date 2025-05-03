@@ -9,6 +9,7 @@ export type Program = {
 };
 
 export function generateProgramPdf(program: Program, takes: Take[]) {
+  // Create a new PDF document
   const doc = new jsPDF();
   
   // Set document properties
@@ -18,8 +19,8 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     author: 'Radio Manager',
     creator: 'Radio Manager App'
   });
-  
-  // Add footer to all pages (will be applied to new pages too)
+
+  // Add footer to all pages
   const addFooter = (doc: jsPDF) => {
     const pageCount = doc.getNumberOfPages();
     // For each page
@@ -43,42 +44,47 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   };
   
   // Set up initial position
-  let y = 20;
+  let y = 30;
   
-  // Add program title with improved styling
-  doc.setFontSize(24);
+  // Modern header with program title
+  doc.setFillColor(155, 135, 245); // Modern light purple
+  doc.rect(0, 0, doc.internal.pageSize.width, 15, 'F');
+  
+  // Add program title with modern styling
+  doc.setFontSize(26);
   doc.setFont("helvetica", "bold");
+  doc.setTextColor(50, 50, 50);
   
   // Calculate center position for title
-  const titleWidth = doc.getStringUnitWidth(program.name) * 24 / doc.internal.scaleFactor;
+  const titleWidth = doc.getStringUnitWidth(program.name) * 26 / doc.internal.scaleFactor;
   const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
   
   doc.text(program.name, titleX, y);
-  y += 15;
+  y += 16;
   
-  // Add divider line
-  doc.setDrawColor(200, 200, 200);
-  doc.setLineWidth(0.5);
-  doc.line(20, y, 190, y);
-  y += 10;
+  // Add stylish divider
+  doc.setDrawColor(155, 135, 245); // Modern purple
+  doc.setLineWidth(1);
+  doc.line(40, y, doc.internal.pageSize.width - 40, y);
+  y += 14;
   
-  // Add publication date
-  doc.setFontSize(11); // Reduced font size
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    "Data di Pubblicazione: " + (program.publishDate 
-      ? new Date(program.publishDate).toLocaleDateString('it-IT') 
-      : "Pubblicazione del programma non registrata"), 
-    20, 
-    y
-  );
-  y += 8; // Reduced spacing
+  // Add publication date with modern styling
+  doc.setFontSize(11);
+  doc.setTextColor(80, 80, 80);
+  doc.setFont("helvetica", "italic");
+  
+  const pubDateText = program.publishDate 
+    ? `Pubblicato il ${new Date(program.publishDate).toLocaleDateString('it-IT')}`
+    : "Data di pubblicazione non disponibile";
+  
+  doc.text(pubDateText, 40, y);
+  y += 6;
   
   // Add generation date
   doc.setFontSize(10);
-  doc.setFont("helvetica", "italic");
-  doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 20, y);
-  y += 10; // Reduced spacing
+  doc.setTextColor(120, 120, 120);
+  doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 40, y);
+  y += 16;
   
   // Sort takes by number
   const sortedTakes = [...takes].sort((a, b) => a.number - b.number);
@@ -88,22 +94,24 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     // Check if we need a new page
     if (y > 250) {
       doc.addPage();
-      y = 20;
+      y = 30;
     }
     
-    // Add take header with improved styling
-    doc.setFontSize(14); // Reduced font size
+    // Add take header with modern styling
+    doc.setFillColor(211, 228, 253); // Soft blue
+    doc.rect(20, y - 5, doc.internal.pageSize.width - 40, 10, 'F');
+    doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(60, 60, 60);
-    doc.text(`Take ${String(take.number).padStart(2, '0')}`, 20, y);
-    y += 6; // Reduced spacing
+    doc.setTextColor(70, 70, 70);
+    doc.text(`Take ${String(take.number).padStart(2, '0')}`, 30, y);
+    y += 12;
     
     if (take.date) {
-      doc.setFontSize(11); // Reduced font size
+      doc.setFontSize(11);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(100, 100, 100);
-      doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 25, y);
-      y += 8; // Reduced spacing
+      doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 40, y);
+      y += 8;
     }
     
     // Sort songs by ID to maintain order
@@ -112,55 +120,46 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     });
     
     // Reset text color for songs
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(60, 60, 60);
     
     // Loop through each song
     for (let i = 0; i < sortedSongs.length; i++) {
       const song = sortedSongs[i];
       
       // Check if we need a new page
-      if (y > 270) {
+      if (y > 265) {
         doc.addPage();
-        y = 20;
+        y = 30;
       }
       
-      doc.setFontSize(11); // Reduced font size 
+      // Song title with modern styling
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(`Brano: ${song.title}`, 30, y);
-      y += 6; // Reduced spacing
+      doc.text(`${i + 1}. ${song.title}`, 40, y);
+      y += 6;
       
-      // Add news without background
+      // Add news with modern styling
       if (song.news && song.news.trim()) {
-        doc.setFontSize(11); // Reduced font size
+        doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
+        doc.setTextColor(80, 80, 80);
         
-        // Removed background styling
-        
-        const splitText = doc.splitTextToSize(`News: ${song.news}`, 150);
-        doc.text(splitText, 40, y);
-        y += 6 * splitText.length + 2; // More compact spacing
-      } else {
-        y += 2; // Minimal spacing when no news
+        const splitText = doc.splitTextToSize(song.news, 150);
+        doc.text(splitText, 50, y);
+        y += 6 * Math.min(splitText.length, 1) + (splitText.length > 1 ? 3 : 0);
       }
       
       // Add thin line separator between songs (but not after the last song)
       if (i < sortedSongs.length - 1) {
-        doc.setDrawColor(230, 230, 230);
+        doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.2);
-        doc.line(40, y + 1, 170, y + 1);
-        y += 3; // Just 1 line of separation
+        doc.line(50, y + 1, 160, y + 1);
+        y += 5; // Just 1 line of separation
       }
     }
     
-    // Add a subtle divider between takes if there were songs
-    if (sortedSongs.length > 0) {
-      doc.setDrawColor(220, 220, 220);
-      doc.setLineWidth(0.3);
-      doc.line(20, y, 190, y);
-      y += 6; // Only 2 rows of separation (approximately)
-    } else {
-      y += 4; // Reduced spacing
-    }
+    // Add space between takes
+    y += 10;
   }
   
   // Add footer with page numbers to all pages
