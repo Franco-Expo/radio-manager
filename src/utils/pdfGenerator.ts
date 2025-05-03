@@ -166,12 +166,23 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         y += 6;
       }
       
-      // Add a single line separation between songs (but not after the last song)
+      // Add two lines of separation between songs (but not after the last song)
       if (i < sortedSongs.length - 1) {
+        // First line
         doc.setDrawColor(150);
         doc.setLineWidth(0.2);
         doc.line(50, y + 1, 160, y + 1);
-        y += 10; // Increased from 5 to 10 for more spacing between songs
+        
+        // Space between lines
+        y += 3;
+        
+        // Second line
+        doc.setDrawColor(150);
+        doc.setLineWidth(0.2);
+        doc.line(50, y + 1, 160, y + 1);
+        
+        // Space after the double line
+        y += 12; // Increased spacing between songs after double line
       }
     }
     
