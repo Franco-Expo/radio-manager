@@ -40,7 +40,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   y += 10;
   
   // Add publication date
-  doc.setFontSize(12);
+  doc.setFontSize(11); // Reduced font size
   doc.setFont("helvetica", "normal");
   doc.text(
     "Data di Pubblicazione: " + (program.publishDate 
@@ -49,13 +49,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     20, 
     y
   );
-  y += 10;
+  y += 8; // Reduced spacing
   
   // Add generation date
   doc.setFontSize(10);
   doc.setFont("helvetica", "italic");
   doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 20, y);
-  y += 15;
+  y += 10; // Reduced spacing
   
   // Sort takes by number
   const sortedTakes = [...takes].sort((a, b) => a.number - b.number);
@@ -69,18 +69,18 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     }
     
     // Add take header with improved styling
-    doc.setFontSize(16);
+    doc.setFontSize(14); // Reduced font size
     doc.setFont("helvetica", "bold");
     doc.setTextColor(60, 60, 60);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, 20, y);
-    y += 8;
+    y += 6; // Reduced spacing
     
     if (take.date) {
-      doc.setFontSize(11);
+      doc.setFontSize(11); // Reduced font size
       doc.setFont("helvetica", "italic");
       doc.setTextColor(100, 100, 100);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 25, y);
-      y += 10;
+      y += 8; // Reduced spacing
     }
     
     // Sort songs by ID to maintain order
@@ -99,36 +99,34 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         y = 20;
       }
       
-      doc.setFontSize(14);
+      doc.setFontSize(11); // Reduced font size 
       doc.setFont("helvetica", "bold");
       doc.text(`Brano: ${song.title}`, 30, y);
-      y += 8;
+      y += 6; // Reduced spacing
       
-      // Add news with word wrap and styled
+      // Add news without background
       if (song.news && song.news.trim()) {
-        doc.setFontSize(12);
+        doc.setFontSize(11); // Reduced font size
         doc.setFont("helvetica", "normal");
         
-        // Add a light gray background for news
-        doc.setFillColor(245, 245, 245);
-        doc.roundedRect(35, y - 4, 160, 8 * (doc.splitTextToSize(song.news, 150).length) + 6, 3, 3, 'F');
+        // Removed background styling
         
         const splitText = doc.splitTextToSize(`News: ${song.news}`, 150);
         doc.text(splitText, 40, y);
-        y += 8 * splitText.length + 5;
+        y += 6 * splitText.length + 2; // More compact spacing
       } else {
-        y += 5;
+        y += 2; // Minimal spacing when no news
       }
     }
     
-    // Add a divider between takes
+    // Add a subtle divider between takes if there were songs
     if (sortedSongs.length > 0) {
       doc.setDrawColor(220, 220, 220);
       doc.setLineWidth(0.3);
       doc.line(20, y, 190, y);
-      y += 10;
+      y += 6; // Only 2 rows of separation (approximately)
     } else {
-      y += 5;
+      y += 4; // Reduced spacing
     }
   }
   
