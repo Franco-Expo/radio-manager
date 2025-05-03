@@ -9,10 +9,10 @@ export type Program = {
 };
 
 export function generateProgramPdf(program: Program, takes: Take[]) {
-  // Create a new PDF document
+  // Crea un nuovo documento PDF
   const doc = new jsPDF();
   
-  // Set document properties
+  // Imposta proprietà del documento
   doc.setProperties({
     title: `Programma ${program.name}`,
     subject: 'Radio Program Schedule',
@@ -20,56 +20,56 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     creator: 'Radio Manager App'
   });
 
-  // Add footer to all pages
+  // Aggiungi piè di pagina a tutte le pagine
   const addFooter = (doc: jsPDF) => {
     const pageCount = doc.getNumberOfPages();
-    // For each page
+    // Per ogni pagina
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       const pageWidth = doc.internal.pageSize.width;
       
-      // Set footer styling
+      // Imposta stile piè di pagina
       doc.setFontSize(9);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(100);
       
-      // Add program name on left
+      // Aggiungi nome programma a sinistra
       doc.text(program.name, 20, 285);
       
-      // Add page number on right
+      // Aggiungi numero pagina a destra
       const pageText = `Pagina ${i} di ${pageCount}`;
       const textWidth = doc.getStringUnitWidth(pageText) * 9 / doc.internal.scaleFactor;
       doc.text(pageText, pageWidth - textWidth - 20, 285);
     }
   };
   
-  // Set up initial position
-  let y = 30;
+  // Posizione iniziale
+  let y = 20;
   
-  // Set font size to 11pt as requested
+  // Dimensione font 11pt come richiesto
   doc.setFontSize(11);
   
-  // Add program title with modern styling
+  // Titolo del programma con stile moderno
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0);
-  doc.setFontSize(26);
+  doc.setFontSize(24);
   
-  // Calculate center position for title
-  const titleWidth = doc.getStringUnitWidth(program.name) * 26 / doc.internal.scaleFactor;
+  // Calcola posizione centrale per titolo
+  const titleWidth = doc.getStringUnitWidth(program.name) * 24 / doc.internal.scaleFactor;
   const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
   
   doc.text(program.name, titleX, y);
-  y += 16;
+  y += 12;
   
-  // Add stylish divider
-  doc.setDrawColor(0);
-  doc.setLineWidth(1);
+  // Divisore stilizzato
+  doc.setDrawColor(80);
+  doc.setLineWidth(0.5);
   doc.line(40, y, doc.internal.pageSize.width - 40, y);
-  y += 14;
+  y += 12;
   
-  // Add publication date with modern styling
-  doc.setFontSize(11);
-  doc.setTextColor(60);
+  // Data di pubblicazione
+  doc.setFontSize(10);
+  doc.setTextColor(80);
   doc.setFont("helvetica", "italic");
   
   const pubDateText = program.publishDate 
@@ -79,13 +79,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   doc.text(pubDateText, 40, y);
   y += 6;
   
-  // Add generation date
+  // Data di generazione
   doc.setFontSize(10);
   doc.setTextColor(80);
   doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 40, y);
   y += 16;
   
-  // Sort takes by number
+  // Ordina take per numero
   const sortedTakes = [...takes].sort((a, b) => a.number - b.number);
   
   if (sortedTakes.length === 0) {
@@ -95,30 +95,30 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     doc.text("Nessun take disponibile per questo programma", 40, y);
   }
   
-  // Loop through each take
+  // Ciclo attraverso ogni take
   for (const take of sortedTakes) {
-    // Check if we need a new page
-    if (y > 250) {
+    // Verifica se serve una nuova pagina
+    if (y > 240) {
       doc.addPage();
-      y = 30;
+      y = 20;
     }
     
-    // Add take header with simple styling (no background)
+    // Intestazione take
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, 30, y);
-    y += 12;
+    y += 10;
     
     if (take.date) {
-      doc.setFontSize(11);
+      doc.setFontSize(10);
       doc.setFont("helvetica", "italic");
-      doc.setTextColor(60);
+      doc.setTextColor(80);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 40, y);
-      y += 8;
+      y += 10;
     }
     
-    // Sort songs by ID to maintain order
+    // Ordina canzoni per ID per mantenere l'ordine
     const sortedSongs = [...take.songs].sort((a, b) => {
       return a.id.localeCompare(b.id);
     });
@@ -127,72 +127,89 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
       doc.text("Nessuna canzone in questa take", 40, y);
-      y += 8;
+      y += 10;
     }
     
-    // Reset text color for songs
+    // Ripristina colore testo per canzoni
     doc.setTextColor(0);
     
-    // Loop through each song
+    // Ciclo attraverso ogni canzone
     for (let i = 0; i < sortedSongs.length; i++) {
       const song = sortedSongs[i];
       
-      // Check if we need a new page
-      if (y > 265) {
+      // Verifica se serve una nuova pagina
+      if (y > 250) {
         doc.addPage();
-        y = 30;
+        y = 20;
       }
       
-      // Song title with font size 11pt
+      // Titolo canzone
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, 40, y);
-      y += 8; // Increased from 6 to 8 for more spacing between title and news
+      y += 12; // Aumentato spazio dopo il titolo
       
-      // Add news with font size 11pt
+      // Aggiungi notizie
       if (song.news && song.news.trim()) {
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(40);
         
-        const splitText = doc.splitTextToSize(song.news, 150);
+        // Gestione del testo su più righe - limitato a 140 caratteri per riga
+        const splitText = doc.splitTextToSize(song.news, 140);
+        
+        // Verifica se è necessaria una nuova pagina per il testo della notizia
+        if (y + splitText.length * 6 > 270) {
+          doc.addPage();
+          y = 20;
+        }
+        
         doc.text(splitText, 50, y);
-        y += 6 * Math.min(splitText.length, 1) + (splitText.length > 1 ? 3 : 0);
+        
+        // Aggiorna la posizione Y basata sul numero di righe (minimo 1)
+        const linesCount = Math.max(1, splitText.length);
+        y += 6 * linesCount + 8; // Spazio aggiuntivo dopo la notizia
       } else {
         doc.setFontSize(11);
         doc.setFont("helvetica", "italic");
         doc.setTextColor(80);
         doc.text("Nessuna notizia", 50, y);
-        y += 6;
+        y += 14;
       }
       
-      // Add two lines of separation between songs (but not after the last song)
+      // Aggiungi due linee di separazione tra canzoni (ma non dopo l'ultima)
       if (i < sortedSongs.length - 1) {
-        // First line
+        // Verifica se c'è abbastanza spazio per le linee di separazione
+        if (y > 260) {
+          doc.addPage();
+          y = 20;
+        }
+        
+        // Prima linea
         doc.setDrawColor(150);
         doc.setLineWidth(0.2);
-        doc.line(50, y + 1, 160, y + 1);
+        doc.line(50, y, 160, y);
         
-        // Space between lines
+        // Spazio tra le linee
         y += 3;
         
-        // Second line
+        // Seconda linea
         doc.setDrawColor(150);
         doc.setLineWidth(0.2);
-        doc.line(50, y + 1, 160, y + 1);
+        doc.line(50, y, 160, y);
         
-        // Space after the double line
-        y += 12; // Increased spacing between songs after double line
+        // Spazio dopo la doppia linea
+        y += 15; // Aumentato spazio tra canzoni
       }
     }
     
-    // Add space between takes
-    y += 10;
+    // Aggiungi spazio tra takes
+    y += 15;
   }
   
-  // Add footer with page numbers to all pages
+  // Aggiungi piè di pagina con numeri di pagina
   addFooter(doc);
   
-  // Save the PDF
+  // Salva il PDF
   doc.save(`Programma_${program.name.replace(/\s+/g, '_')}.pdf`);
 }
