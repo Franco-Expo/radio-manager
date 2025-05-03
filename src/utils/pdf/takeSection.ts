@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Take } from '@/types/takes';
-import { FONT_SIZES, PAGE_HEIGHT } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
 import { renderSongs } from './songSection';
 
 export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
@@ -14,37 +14,37 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
     doc.setFont("helvetica", "italic");
     doc.setFontSize(FONT_SIZES.normal);
     doc.setTextColor(80);
-    doc.text("Nessun take disponibile per questo programma", 20, y);
+    doc.text("Nessun take disponibile per questo programma", DOCUMENT_MARGINS.left, y);
     return;
   }
   
   // Loop through each take
   for (const take of sortedTakes) {
-    // Check if we need a new page
-    if (y > PAGE_HEIGHT - 40) {
-      doc.addPage();
-      y = 20;
-    }
+    // Estimate height needed for take header
+    const takeHeaderHeight = 16; // Approximate height for title and date
+    
+    // Check if we need a page break for the take header
+    y = checkForPageBreak(doc, y, takeHeaderHeight);
     
     // Take header
     doc.setFontSize(FONT_SIZES.subtitle);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
-    doc.text(`Take ${String(take.number).padStart(2, '0')}`, 20, y);
-    y += 8;
+    doc.text(`Take ${String(take.number).padStart(2, '0')}`, DOCUMENT_MARGINS.left, y);
+    y += 6;
     
     if (take.date) {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
-      doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 30, y);
-      y += 8;
+      doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, DOCUMENT_MARGINS.left + 10, y);
+      y += 7;
     }
     
     // Render songs for this take
     y = renderSongs(doc, take.songs, y);
     
     // Space between takes
-    y += 10; // Space between takes
+    y += 8; // Space between takes
   }
 }

@@ -9,8 +9,12 @@ import { renderTakes } from './pdf/takeSection';
 export type { Program } from './pdf/types';
 
 export function generateProgramPdf(program: Program, takes: Take[]) {
-  // Create a new PDF document
-  const doc = new jsPDF();
+  // Create a new PDF document - A4 format
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  });
   
   // Setup document properties
   setupDocumentProperties(doc, {

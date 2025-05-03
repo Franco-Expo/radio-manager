@@ -9,15 +9,19 @@ export const DOCUMENT_MARGINS = {
   right: 20
 };
 
+// Updated font sizes to be more like Microsoft Word standard formatting
 export const FONT_SIZES = {
-  title: 24,
-  subtitle: 14,
-  normal: 11,
+  title: 16,    // Reduced from 24 to be less dramatic
+  subtitle: 13, // More appropriate for section headers
+  normal: 11,   // Standard Word document size
   small: 10,
   footer: 9
 };
 
-export const PAGE_HEIGHT = 280; // Height before footer
+// Page dimensions
+export const PAGE_WIDTH = 210; // A4 width in mm
+export const PAGE_HEIGHT = 297; // A4 height in mm
+export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARGINS.bottom;
 
 // Configure document properties
 export function setupDocumentProperties(doc: jsPDF, options: {
@@ -32,6 +36,10 @@ export function setupDocumentProperties(doc: jsPDF, options: {
     author: options.author,
     creator: options.creator
   });
+  
+  // Set default font size and font family for the document
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(FONT_SIZES.normal);
 }
 
 // Set up footer for all pages
@@ -50,14 +58,27 @@ export function addFooter(doc: jsPDF, programName: string) {
     // Add line above footer
     doc.setDrawColor(80);
     doc.setLineWidth(0.5);
-    doc.line(20, 280, pageWidth - 20, 280);
+    doc.line(DOCUMENT_MARGINS.left, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5, 
+             pageWidth - DOCUMENT_MARGINS.right, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5);
     
     // Add program name on left
-    doc.text(programName, 20, 285);
+    doc.text(programName, DOCUMENT_MARGINS.left, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2);
     
     // Add page number on right
     const pageText = `Pagina ${i} di ${pageCount}`;
     const textWidth = doc.getStringUnitWidth(pageText) * FONT_SIZES.footer / doc.internal.scaleFactor;
-    doc.text(pageText, pageWidth - textWidth - 20, 285);
+    doc.text(pageText, pageWidth - textWidth - DOCUMENT_MARGINS.right, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2);
   }
+}
+
+// Helper function to check if there's enough space on the current page
+export function checkForPageBreak(doc: jsPDF, y: number, requiredHeight: number): number {
+  const maxY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
+  
+  if (y + requiredHeight > maxY) {
+    doc.addPage();
+    return DOCUMENT_MARGINS.top;
+  }
+  
+  return y;
 }

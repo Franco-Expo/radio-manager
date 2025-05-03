@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Song } from '@/types/takes';
-import { FONT_SIZES, PAGE_HEIGHT } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
 
 export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   let y = startY;
@@ -14,8 +14,8 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   if (sortedSongs.length === 0) {
     doc.setFont("helvetica", "italic");
     doc.setTextColor(80);
-    doc.text("Nessuna canzone in questa take", 30, y);
-    return y + 8;
+    doc.text("Nessuna canzone in questa take", DOCUMENT_MARGINS.left + 10, y);
+    return y + 7;
   }
   
   // Reset text color for songs
@@ -25,50 +25,48 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   for (let i = 0; i < sortedSongs.length; i++) {
     const song = sortedSongs[i];
     
-    // Check if we need a new page
-    if (y > PAGE_HEIGHT - 30) {
-      doc.addPage();
-      y = 20;
-    }
+    // Estimate height needed for song title
+    const songTitleHeight = 6;
     
-    // Song title - more compact
+    // Check if we need a new page for the song title
+    y = checkForPageBreak(doc, y, songTitleHeight);
+    
+    // Song title
     doc.setFontSize(FONT_SIZES.normal);
     doc.setFont("helvetica", "bold");
-    doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, 30, y);
-    y += 6; // Reduced space after title
+    doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, DOCUMENT_MARGINS.left + 10, y);
+    y += 5;
     
     // Add news
     if (song.news && song.news.trim()) {
-      doc.setFontSize(FONT_SIZES.small); // Smaller font for news to fit more on page
+      doc.setFontSize(FONT_SIZES.normal);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(40);
       
-      // Text handling - limited to 150 characters per line for better space usage
-      const splitText = doc.splitTextToSize(song.news, 150);
+      // Split text to respect margins
+      const maxWidth = doc.internal.pageSize.width - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right - 15;
+      const splitText = doc.splitTextToSize(song.news, maxWidth);
       
-      // Check if we need a new page for news text
-      if (y + splitText.length * 5 > PAGE_HEIGHT - 10) {
-        doc.addPage();
-        y = 20;
-      }
+      // Check height needed for the news text
+      const textHeight = splitText.length * 5;
       
-      doc.text(splitText, 35, y);
+      // Check if we need a new page for the news text
+      y = checkForPageBreak(doc, y, textHeight);
       
-      // Update Y position based on number of lines (minimum 1)
-      const linesCount = Math.max(1, splitText.length);
-      y += 5 * linesCount + 5; // Reduced space after news
+      doc.text(splitText, DOCUMENT_MARGINS.left + 15, y);
+      
+      // Update Y position based on number of lines
+      y += textHeight + 2;
     } else {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
-      doc.text("Nessuna notizia", 35, y);
-      y += 8;
+      doc.text("Nessuna notizia", DOCUMENT_MARGINS.left + 15, y);
+      y += 7;
     }
     
-    // Add space between songs
-    if (i < sortedSongs.length - 1) {
-      y += 6; // Space between songs
-    }
+    // Small space between songs
+    y += 3;
   }
   
   return y; // Return the updated Y position
