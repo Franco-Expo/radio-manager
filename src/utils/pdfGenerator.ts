@@ -19,6 +19,29 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     creator: 'Radio Manager App'
   });
   
+  // Add footer to all pages (will be applied to new pages too)
+  const addFooter = (doc: jsPDF) => {
+    const pageCount = doc.getNumberOfPages();
+    // For each page
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Set footer styling
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(100, 100, 100);
+      
+      // Add program name on left
+      doc.text(program.name, 20, 285);
+      
+      // Add page number on right
+      const pageText = `Pagina ${i} di ${pageCount}`;
+      const textWidth = doc.getStringUnitWidth(pageText) * 9 / doc.internal.scaleFactor;
+      doc.text(pageText, pageWidth - textWidth - 20, 285);
+    }
+  };
+  
   // Set up initial position
   let y = 20;
   
@@ -92,7 +115,9 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     doc.setTextColor(0, 0, 0);
     
     // Loop through each song
-    for (const song of sortedSongs) {
+    for (let i = 0; i < sortedSongs.length; i++) {
+      const song = sortedSongs[i];
+      
       // Check if we need a new page
       if (y > 270) {
         doc.addPage();
@@ -117,6 +142,14 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       } else {
         y += 2; // Minimal spacing when no news
       }
+      
+      // Add thin line separator between songs (but not after the last song)
+      if (i < sortedSongs.length - 1) {
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(0.2);
+        doc.line(40, y + 1, 170, y + 1);
+        y += 3; // Just 1 line of separation
+      }
     }
     
     // Add a subtle divider between takes if there were songs
@@ -129,6 +162,9 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       y += 4; // Reduced spacing
     }
   }
+  
+  // Add footer with page numbers to all pages
+  addFooter(doc);
   
   // Save the PDF
   doc.save(`Programma_${program.name.replace(/\s+/g, '_')}.pdf`);
