@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Take } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, PAGE_HEIGHT } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
 import { renderSongs } from './songSection';
 
 export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
@@ -19,17 +19,12 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
   }
   
   // Loop through each take
-  for (let i = 0; i < sortedTakes.length; i++) {
-    const take = sortedTakes[i];
-    
+  for (const take of sortedTakes) {
     // Estimate height needed for take header
     const takeHeaderHeight = 16; // Approximate height for title and date
     
     // Check if we need a page break for the take header
-    if (y + takeHeaderHeight > PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10) {
-      doc.addPage();
-      y = DOCUMENT_MARGINS.top;
-    }
+    y = checkForPageBreak(doc, y, takeHeaderHeight);
     
     // Take header
     doc.setFontSize(FONT_SIZES.subtitle);
@@ -51,11 +46,5 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
     
     // Space between takes
     y += 8; // Space between takes
-    
-    // Check if we have enough space for the next take header
-    if (i < sortedTakes.length - 1 && y + 15 > PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10) {
-      doc.addPage();
-      y = DOCUMENT_MARGINS.top;
-    }
   }
 }

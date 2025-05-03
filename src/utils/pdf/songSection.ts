@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Song } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, PAGE_HEIGHT } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
 
 export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   let y = startY;
@@ -25,14 +25,6 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   for (let i = 0; i < sortedSongs.length; i++) {
     const song = sortedSongs[i];
     
-    // Check for page break before starting a new song
-    // We need at least 30mm of space for a song title and minimal content
-    const neededSpace = 30;
-    if (y + neededSpace > PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10) {
-      doc.addPage();
-      y = DOCUMENT_MARGINS.top;
-    }
-    
     // Song title with artist
     doc.setFontSize(FONT_SIZES.normal);
     doc.setFont("helvetica", "bold");
@@ -55,17 +47,10 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       const maxWidth = doc.internal.pageSize.width - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right - 15;
       const splitText = doc.splitTextToSize(song.news, maxWidth);
       
-      // Check if news text will fit on current page, otherwise move to next page
-      const textHeight = splitText.length * 5 + 2;
-      if (y + textHeight > PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10) {
-        doc.addPage();
-        y = DOCUMENT_MARGINS.top;
-      }
-      
       doc.text(splitText, DOCUMENT_MARGINS.left + 15, y);
       
       // Update Y position based on number of lines
-      y += textHeight;
+      y += splitText.length * 5 + 2;
     } else {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
@@ -76,12 +61,6 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     
     // Space between songs
     y += 7;
-    
-    // Check if we have enough space for at least some content of the next song
-    if (i < sortedSongs.length - 1 && y + 15 > PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10) {
-      doc.addPage();
-      y = DOCUMENT_MARGINS.top;
-    }
   }
   
   return y; // Return the updated Y position
