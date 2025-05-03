@@ -147,7 +147,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
       doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, 40, y);
-      y += 6;
+      y += 8; // Increased from 6 to 8 for more spacing between title and news
       
       // Add news with font size 11pt
       if (song.news && song.news.trim()) {
@@ -171,7 +171,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
         doc.setDrawColor(150);
         doc.setLineWidth(0.2);
         doc.line(50, y + 1, 160, y + 1);
-        y += 5; // Just 1 line of separation as requested
+        y += 10; // Increased from 5 to 10 for more spacing between songs
       }
     }
     
