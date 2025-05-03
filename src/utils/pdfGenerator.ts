@@ -31,7 +31,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       // Set footer styling
       doc.setFontSize(9);
       doc.setFont("helvetica", "italic");
-      doc.setTextColor(100, 100, 100);
+      doc.setTextColor(100);
       
       // Add program name on left
       doc.text(program.name, 20, 285);
@@ -51,7 +51,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   
   // Add program title with modern styling
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(50, 50, 50);
+  doc.setTextColor(0);
   doc.setFontSize(26);
   
   // Calculate center position for title
@@ -62,14 +62,14 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   y += 16;
   
   // Add stylish divider
-  doc.setDrawColor(155, 135, 245); // Modern purple
+  doc.setDrawColor(0);
   doc.setLineWidth(1);
   doc.line(40, y, doc.internal.pageSize.width - 40, y);
   y += 14;
   
   // Add publication date with modern styling
   doc.setFontSize(11);
-  doc.setTextColor(80, 80, 80);
+  doc.setTextColor(60);
   doc.setFont("helvetica", "italic");
   
   const pubDateText = program.publishDate 
@@ -81,7 +81,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   
   // Add generation date
   doc.setFontSize(10);
-  doc.setTextColor(120, 120, 120);
+  doc.setTextColor(80);
   doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, 40, y);
   y += 16;
   
@@ -91,7 +91,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
   if (sortedTakes.length === 0) {
     doc.setFont("helvetica", "italic");
     doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
+    doc.setTextColor(80);
     doc.text("Nessun take disponibile per questo programma", 40, y);
   }
   
@@ -106,14 +106,14 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     // Add take header with simple styling (no background)
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(70, 70, 70);
+    doc.setTextColor(0);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, 30, y);
     y += 12;
     
     if (take.date) {
       doc.setFontSize(11);
       doc.setFont("helvetica", "italic");
-      doc.setTextColor(100, 100, 100);
+      doc.setTextColor(60);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, 40, y);
       y += 8;
     }
@@ -125,13 +125,13 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
     
     if (sortedSongs.length === 0) {
       doc.setFont("helvetica", "italic");
-      doc.setTextColor(100, 100, 100);
+      doc.setTextColor(80);
       doc.text("Nessuna canzone in questa take", 40, y);
       y += 8;
     }
     
     // Reset text color for songs
-    doc.setTextColor(60, 60, 60);
+    doc.setTextColor(0);
     
     // Loop through each song
     for (let i = 0; i < sortedSongs.length; i++) {
@@ -153,7 +153,7 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       if (song.news && song.news.trim()) {
         doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(80, 80, 80);
+        doc.setTextColor(40);
         
         const splitText = doc.splitTextToSize(song.news, 150);
         doc.text(splitText, 50, y);
@@ -161,14 +161,14 @@ export function generateProgramPdf(program: Program, takes: Take[]) {
       } else {
         doc.setFontSize(11);
         doc.setFont("helvetica", "italic");
-        doc.setTextColor(120, 120, 120);
+        doc.setTextColor(80);
         doc.text("Nessuna notizia", 50, y);
         y += 6;
       }
       
       // Add a single line separation between songs (but not after the last song)
       if (i < sortedSongs.length - 1) {
-        doc.setDrawColor(200, 200, 200);
+        doc.setDrawColor(150);
         doc.setLineWidth(0.2);
         doc.line(50, y + 1, 160, y + 1);
         y += 5; // Just 1 line of separation as requested
