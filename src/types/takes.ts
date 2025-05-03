@@ -2,6 +2,7 @@
 export interface Song {
   id: string;
   title: string;
+  artist?: string; // Added artist field as optional
   news: string;
 }
 

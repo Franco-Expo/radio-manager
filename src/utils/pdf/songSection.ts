@@ -25,8 +25,8 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   for (let i = 0; i < sortedSongs.length; i++) {
     const song = sortedSongs[i];
     
-    // Estimate height needed for song title
-    const songTitleHeight = 6;
+    // Estimate height needed for song title and artist
+    const songTitleHeight = 12; // Increased to accommodate title and artist
     
     // Check if we need a new page for the song title
     y = checkForPageBreak(doc, y, songTitleHeight);
@@ -34,8 +34,12 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     // Song title
     doc.setFontSize(FONT_SIZES.normal);
     doc.setFont("helvetica", "bold");
-    doc.text(`${i + 1}. ${song.title || "Titolo non specificato"}`, DOCUMENT_MARGINS.left + 10, y);
-    y += 5;
+    
+    // Format: Number. Title - Artist
+    const titleText = song.title || "Titolo non specificato";
+    const artistText = song.artist ? ` - ${song.artist}` : "";
+    doc.text(`${i + 1}. ${titleText}${artistText}`, DOCUMENT_MARGINS.left + 10, y);
+    y += 8; // Increased spacing after title/artist
     
     // Add news
     if (song.news && song.news.trim()) {
@@ -66,7 +70,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     }
     
     // Small space between songs
-    y += 3;
+    y += 5; // Increased space between songs
   }
   
   return y; // Return the updated Y position
