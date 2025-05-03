@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Take } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, FORCE_BREAK_LINE } from './documentStyles';
 import { renderSongs } from './songSection';
 
 export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
@@ -20,6 +20,12 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
   
   // Loop through each take
   for (const take of sortedTakes) {
+    // Check if we need to force a page break at line 49 from bottom
+    if (y >= FORCE_BREAK_LINE) {
+      doc.addPage();
+      y = DOCUMENT_MARGINS.top;
+    }
+    
     // Estimate height needed for take header
     const takeHeaderHeight = 16; // Approximate height for title and date
     

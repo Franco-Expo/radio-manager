@@ -1,4 +1,3 @@
-
 import { jsPDF } from 'jspdf';
 
 // Constants for document styling
@@ -22,6 +21,12 @@ export const FONT_SIZES = {
 export const PAGE_WIDTH = 210; // A4 width in mm
 export const PAGE_HEIGHT = 297; // A4 height in mm
 export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARGINS.bottom;
+
+// Line height to be used for calculations
+export const LINE_HEIGHT = 5;
+
+// Line number from bottom for forced page break (49 lines from bottom)
+export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (49 * LINE_HEIGHT);
 
 // Configure document properties
 export function setupDocumentProperties(doc: jsPDF, options: {
@@ -73,6 +78,13 @@ export function addFooter(doc: jsPDF, programName: string) {
 
 // Helper function to check if there's enough space on the current page
 export function checkForPageBreak(doc: jsPDF, y: number, requiredHeight: number): number {
+  // Check if we've reached the forced break line
+  if (y >= FORCE_BREAK_LINE) {
+    doc.addPage();
+    return DOCUMENT_MARGINS.top;
+  }
+  
+  // Also keep the original functionality to check for space
   const maxY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
   
   if (y + requiredHeight > maxY) {

@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Song } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, FORCE_BREAK_LINE } from './documentStyles';
 
 export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   let y = startY;
@@ -25,6 +25,12 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   for (let i = 0; i < sortedSongs.length; i++) {
     const song = sortedSongs[i];
     
+    // Check if we need to force a page break at line 49 from bottom
+    if (y >= FORCE_BREAK_LINE) {
+      doc.addPage();
+      y = DOCUMENT_MARGINS.top;
+    }
+    
     // Song title with artist
     doc.setFontSize(FONT_SIZES.normal);
     doc.setFont("helvetica", "bold");
@@ -32,6 +38,10 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     // Format: Number. Title - Artist
     const titleText = song.title || "Titolo non specificato";
     const artistText = song.artist ? ` - ${song.artist}` : "";
+    const songHeaderHeight = 7;
+    
+    // Check for page break before drawing the song title
+    y = checkForPageBreak(doc, y, songHeaderHeight);
     doc.text(`${i + 1}. ${titleText}${artistText}`, DOCUMENT_MARGINS.left + 10, y);
     
     // Move down for news (with an empty line in between)
@@ -47,14 +57,22 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       const maxWidth = doc.internal.pageSize.width - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right - 15;
       const splitText = doc.splitTextToSize(song.news, maxWidth);
       
+      // Calculate news text height
+      const newsHeight = splitText.length * 5;
+      
+      // Check for page break before drawing the news
+      y = checkForPageBreak(doc, y, newsHeight);
       doc.text(splitText, DOCUMENT_MARGINS.left + 15, y);
       
       // Update Y position based on number of lines
-      y += splitText.length * 5 + 2;
+      y += newsHeight + 2;
     } else {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
+      
+      // Check for page break
+      y = checkForPageBreak(doc, y, 7);
       doc.text("Nessuna notizia", DOCUMENT_MARGINS.left + 15, y);
       y += 7;
     }
