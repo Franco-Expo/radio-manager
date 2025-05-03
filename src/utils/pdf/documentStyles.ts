@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 
 // Constants for document styling
 export const DOCUMENT_MARGINS = {
-  top: 10,
+  top: 20,
   bottom: 20,
   left: 20,
   right: 20
