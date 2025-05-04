@@ -74,9 +74,8 @@ export function addFooter(doc: jsPDF, programName: string) {
   }
 }
 
-// Helper function to check if there's enough space on the current page
+// Simple page break check - just checks if we need a new page based on available space
 export function checkForPageBreak(doc: jsPDF, y: number, requiredHeight: number): number {
-  // Check if we need a page break based on available space
   const maxY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
   
   if (y + requiredHeight > maxY) {
