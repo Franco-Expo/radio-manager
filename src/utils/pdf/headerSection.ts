@@ -22,7 +22,7 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
   doc.setDrawColor(80);
   doc.setLineWidth(0.5);
   doc.line(DOCUMENT_MARGINS.left, y, doc.internal.pageSize.width - DOCUMENT_MARGINS.right, y);
-  y += 6; // Reduced from 8
+  y += 8; // Reduced from 8
   
   // Publication date
   doc.setFontSize(FONT_SIZES.small);
