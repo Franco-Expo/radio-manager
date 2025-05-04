@@ -51,7 +51,7 @@ export function addAutoPagingText(
   const originalFontSize = doc.getFontSize();
   const originalFontStyle = doc.getFont().fontStyle;
   const maxWidth = options?.maxWidth || CONTENT_WIDTH;
-  const lineSpacing = options?.lineSpacing || 1.0; // Reduced from 1.2 to make text more compact
+  const lineSpacing = options?.lineSpacing || 0.5; // Reduced from 1.2 to make text more compact
   
   // Apply temporary styles if specified
   if (options?.fontSize) doc.setFontSize(FONT_SIZES[options.fontSize]);
