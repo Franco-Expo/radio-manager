@@ -16,13 +16,13 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
   const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
   
   doc.text(program.name, titleX, y);
-  y += 10;
+  y += 8; // Reduced from 10
   
   // Stylized divider at the top
   doc.setDrawColor(80);
   doc.setLineWidth(0.5);
   doc.line(DOCUMENT_MARGINS.left, y, doc.internal.pageSize.width - DOCUMENT_MARGINS.right, y);
-  y += 10;
+  y += 8; // Reduced from 10
   
   // Publication date
   doc.setFontSize(FONT_SIZES.small);
@@ -34,13 +34,13 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
     : "Data di pubblicazione non disponibile";
   
   doc.text(pubDateText, DOCUMENT_MARGINS.left, y);
-  y += 5;
+  y += 4; // Reduced from 5
   
   // Generation date
   doc.setFontSize(FONT_SIZES.small);
   doc.setTextColor(80);
   doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, DOCUMENT_MARGINS.left, y);
-  y += 10;
+  y += 8; // Reduced from 10
   
   return y; // Return the new Y position
 }

@@ -15,7 +15,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     doc.setFont("helvetica", "italic");
     doc.setTextColor(80);
     doc.text("Nessuna canzone in questa take", DOCUMENT_MARGINS.left + 10, y);
-    return y + 7;
+    return y + 5; // Reduced from 7
   }
   
   // Reset text color for songs
@@ -33,14 +33,14 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     const titleText = song.title || "Titolo non specificato";
     const artistText = song.artist ? ` - ${song.artist}` : "";
     const songHeaderText = `${i + 1}. ${titleText}${artistText}`;
-    const songHeaderHeight = 7;
+    const songHeaderHeight = 5; // Reduced from 7
     
     // Check for page break before drawing the song title
     y = checkForPageBreak(doc, y, songHeaderHeight);
     doc.text(songHeaderText, DOCUMENT_MARGINS.left + 10, y);
     
     // Move down slightly for news, minimizing space
-    y += 4;
+    y += 3; // Reduced from 4
     
     // Add news with optimized text flow
     if (song.news && song.news.trim()) {
@@ -51,10 +51,10 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       
       const maxWidth = doc.internal.pageSize.width - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right - 15;
       
-      // Use the enhanced automatic paging text function
+      // Use the enhanced automatic paging text function with reduced line spacing
       y = addAutoPagingText(doc, song.news, DOCUMENT_MARGINS.left + 15, y, {
         maxWidth: maxWidth,
-        lineSpacing: 1.1 // Slightly tighter spacing for news
+        lineSpacing: 0.9 // Reduced from 1.1 for even tighter spacing for news
       });
     } else {
       doc.setFontSize(FONT_SIZES.small);
@@ -62,13 +62,13 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       doc.setTextColor(80);
       
       // Check for page break
-      y = checkForPageBreak(doc, y, 7);
+      y = checkForPageBreak(doc, y, 5); // Reduced from 7
       doc.text("Nessuna notizia", DOCUMENT_MARGINS.left + 15, y);
-      y += 5;
+      y += 4; // Reduced from 5
     }
     
     // Minimal space between songs
-    y += 3;
+    y += 2; // Reduced from 3
   }
   
   return y;
