@@ -9,24 +9,64 @@ export const DOCUMENT_MARGINS = {
   right: 20
 };
 
-// Updated font sizes to be more like Microsoft Word standard formatting
 export const FONT_SIZES = {
-  title: 16,    // Reduced from 24 to be less dramatic
-  subtitle: 13, // More appropriate for section headers
-  normal: 11,   // Standard Word document size
+  title: 16,
+  subtitle: 13,
+  normal: 11,
   small: 10,
   footer: 9
 };
 
-// Page dimensions
-export const PAGE_WIDTH = 210; // A4 width in mm
-export const PAGE_HEIGHT = 297; // A4 height in mm
-export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARGINS.bottom;
+export const PAGE_WIDTH = 210;
+export const PAGE_HEIGHT = 297;
+const CONTENT_WIDTH = PAGE_WIDTH - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right;
+const MAX_Y = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
 
-// Line height to be used for calculations
-export const LINE_HEIGHT = 5;
+// Calcola l'altezza della linea in base alla dimensione del font
+export function getLineHeight(doc: jsPDF): number {
+  return doc.getFontSize() * 1.5;
+}
 
-// Configure document properties
+// Aggiunge testo con gestione automatica delle pagine
+export function addAutoPagingText(
+  doc: jsPDF,
+  text: string,
+  x: number,
+  y: number,
+  options?: {
+    maxWidth?: number,
+    fontStyle?: 'normal' | 'bold' | 'italic',
+    fontSize?: keyof typeof FONT_SIZES
+  }
+): number {
+  const originalFontSize = doc.getFontSize();
+  const maxWidth = options?.maxWidth || CONTENT_WIDTH;
+  
+  // Applica stili temporanei se specificati
+  if (options?.fontSize) doc.setFontSize(FONT_SIZES[options.fontSize]);
+  if (options?.fontStyle) doc.setFont(doc.getFont().fontName, options.fontStyle);
+
+  const lineHeight = getLineHeight(doc);
+  const lines = doc.splitTextToSize(text, maxWidth);
+
+  for (const line of lines) {
+    // Controllo avanzato per pagina piena
+    if (y + lineHeight > MAX_Y) {
+      doc.addPage();
+      y = DOCUMENT_MARGINS.top;
+    }
+
+    doc.text(line, x, y);
+    y += lineHeight;
+  }
+
+  // Ripristina stili originali
+  doc.setFontSize(originalFontSize);
+  doc.setFont(doc.getFont().fontName, 'normal');
+  
+  return y;
+}
+
 export function setupDocumentProperties(doc: jsPDF, options: {
   title: string;
   subject: string;
@@ -40,48 +80,50 @@ export function setupDocumentProperties(doc: jsPDF, options: {
     creator: options.creator
   });
   
-  // Set default font size and font family for the document
   doc.setFont("helvetica", "normal");
   doc.setFontSize(FONT_SIZES.normal);
 }
 
-// Set up footer for all pages
 export function addFooter(doc: jsPDF, programName: string) {
   const pageCount = doc.getNumberOfPages();
+  const footerY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2;
   
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     const pageWidth = doc.internal.pageSize.width;
     
-    // Set footer style
     doc.setFontSize(FONT_SIZES.footer);
     doc.setFont("helvetica", "italic");
     doc.setTextColor(100);
     
-    // Add line above footer
+    // Linea separatrice
     doc.setDrawColor(80);
     doc.setLineWidth(0.5);
-    doc.line(DOCUMENT_MARGINS.left, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5, 
-             pageWidth - DOCUMENT_MARGINS.right, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5);
+    doc.line(
+      DOCUMENT_MARGINS.left,
+      PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5,
+      pageWidth - DOCUMENT_MARGINS.right,
+      PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5
+    );
     
-    // Add program name on left
-    doc.text(programName, DOCUMENT_MARGINS.left, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2);
+    // Testo footer
+    doc.text(programName, DOCUMENT_MARGINS.left, footerY);
     
-    // Add page number on right
+    // Numero pagina
     const pageText = `Pagina ${i} di ${pageCount}`;
-    const textWidth = doc.getStringUnitWidth(pageText) * FONT_SIZES.footer / doc.internal.scaleFactor;
-    doc.text(pageText, pageWidth - textWidth - DOCUMENT_MARGINS.right, PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2);
+    const textWidth = doc.getTextWidth(pageText);
+    doc.text(pageText, pageWidth - textWidth - DOCUMENT_MARGINS.right, footerY);
   }
 }
 
-// Simple page break check - just checks if we need a new page based on available space
-export function checkForPageBreak(doc: jsPDF, y: number, requiredHeight: number): number {
-  const maxY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
+// Nuova funzione per iniziare nuovi blocchi di contenuto
+export function startNewContentBlock(doc: jsPDF, y: number, spacing: number = 10): number {
+  let newY = y + spacing;
   
-  if (y + requiredHeight > maxY) {
+  if (newY > MAX_Y) {
     doc.addPage();
-    return DOCUMENT_MARGINS.top;
+    newY = DOCUMENT_MARGINS.top;
   }
   
-  return y;
+  return newY;
 }
