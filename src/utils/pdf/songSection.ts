@@ -40,7 +40,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     doc.text(songHeaderText, DOCUMENT_MARGINS.left + 10, y);
     
     // Move down slightly for news, minimizing space
-    y += 5; // Reduced from 3
+    y += 6; // Reduced from 3
     
     // Add news with optimized text flow
     if (song.news && song.news.trim()) {
