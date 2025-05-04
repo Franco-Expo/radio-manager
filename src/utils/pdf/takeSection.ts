@@ -38,7 +38,7 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, DOCUMENT_MARGINS.left + 10, y);
-      y += 4; // Reduced from 5
+      y += 7; // Reduced from 5
     }
     
     // Render songs for this take with improved text flow
