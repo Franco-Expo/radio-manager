@@ -16,6 +16,7 @@ import {
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { CalendarIcon, FileText, FilePlus, Trash2, X } from "lucide-react";
+import { toast as sonnerToast } from "sonner";
 
 type Program = {
   id: string;
@@ -42,14 +43,17 @@ export function ProgramItem({
 }: ProgramItemProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (confirm("Sei sicuro di voler cancellare questo programma e tutte le sue take?")) {
       onDelete();
     }
   };
 
-  const handleClearPublishDate = () => {
+  const handleClearPublishDate = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onPublishDateChange(null);
+    sonnerToast.success("Data di pubblicazione cancellata");
   };
 
   const handleCreateTake = (e: React.MouseEvent) => {
@@ -99,7 +103,10 @@ export function ProgramItem({
           Crea nuova Take
         </ContextMenuItem>
         <ContextMenuItem 
-          onClick={() => onExportPdf(program.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onExportPdf(program.id);
+          }}
           className="flex items-center gap-2"
         >
           <FileText className="h-4 w-4" />
