@@ -24,7 +24,7 @@ const MAX_Y = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
 
 // Calcola l'altezza della linea in base alla dimensione del font
 export function getLineHeight(doc: jsPDF): number {
-  return doc.getFontSize() * 0.25; // Reduced from 0.30 for even tighter line spacing
+  return doc.getFontSize() * 0.30; // Reduced from 0.30 for even tighter line spacing
 }
 
 // Enhanced function to check if we need a page break with better content flow
