@@ -21,7 +21,7 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
   // Loop through each take
   for (const take of sortedTakes) {
     // Estimate height needed for take header
-    const takeHeaderHeight = 12; // Reduced from 16
+    const takeHeaderHeight = 10; // Reduced from 12
     
     // Check if we need a page break for the take header
     y = checkForPageBreak(doc, y, takeHeaderHeight);
@@ -31,20 +31,20 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, DOCUMENT_MARGINS.left, y);
-    y += 5; // Reduced from 6
+    y += 4; // Reduced from 5
     
     if (take.date) {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
       doc.setTextColor(80);
       doc.text(`Data: ${new Date(take.date).toLocaleDateString('it-IT')}`, DOCUMENT_MARGINS.left + 10, y);
-      y += 5; // Reduced from 7
+      y += 4; // Reduced from 5
     }
     
     // Render songs for this take with improved text flow
     y = renderSongs(doc, take.songs, y);
     
     // Space between takes
-    y += 6; // Reduced from 8
+    y += 4; // Reduced from 6
   }
 }

@@ -15,7 +15,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     doc.setFont("helvetica", "italic");
     doc.setTextColor(80);
     doc.text("Nessuna canzone in questa take", DOCUMENT_MARGINS.left + 10, y);
-    return y + 5; // Reduced from 7
+    return y + 4; // Reduced from 5
   }
   
   // Reset text color for songs
@@ -33,14 +33,14 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     const titleText = song.title || "Titolo non specificato";
     const artistText = song.artist ? ` - ${song.artist}` : "";
     const songHeaderText = `${i + 1}. ${titleText}${artistText}`;
-    const songHeaderHeight = 5; // Reduced from 7
+    const songHeaderHeight = 4; // Reduced from 5
     
     // Check for page break before drawing the song title
     y = checkForPageBreak(doc, y, songHeaderHeight);
     doc.text(songHeaderText, DOCUMENT_MARGINS.left + 10, y);
     
     // Move down slightly for news, minimizing space
-    y += 3; // Reduced from 4
+    y += 2; // Reduced from 3
     
     // Add news with optimized text flow
     if (song.news && song.news.trim()) {
@@ -54,7 +54,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       // Use the enhanced automatic paging text function with reduced line spacing
       y = addAutoPagingText(doc, song.news, DOCUMENT_MARGINS.left + 15, y, {
         maxWidth: maxWidth,
-        lineSpacing: 0.9 // Reduced from 1.1 for even tighter spacing for news
+        lineSpacing: 0.6 // Reduced from 0.9 for much tighter spacing for news
       });
     } else {
       doc.setFontSize(FONT_SIZES.small);
@@ -62,13 +62,13 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       doc.setTextColor(80);
       
       // Check for page break
-      y = checkForPageBreak(doc, y, 5); // Reduced from 7
+      y = checkForPageBreak(doc, y, 4); // Reduced from 5
       doc.text("Nessuna notizia", DOCUMENT_MARGINS.left + 15, y);
-      y += 4; // Reduced from 5
+      y += 3; // Reduced from 4
     }
     
     // Minimal space between songs
-    y += 2; // Reduced from 3
+    y += 1; // Reduced from 2
   }
   
   return y;
