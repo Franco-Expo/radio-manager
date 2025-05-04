@@ -1,6 +1,6 @@
 
 import { jsPDF } from 'jspdf';
-import { FONT_SIZES, DOCUMENT_MARGINS } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, addAutoPagingText } from './documentStyles';
 import { Program } from './types';
 
 export function addProgramHeader(doc: jsPDF, program: Program): number {

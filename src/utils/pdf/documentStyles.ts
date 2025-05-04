@@ -24,10 +24,10 @@ const MAX_Y = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
 
 // Calcola l'altezza della linea in base alla dimensione del font
 export function getLineHeight(doc: jsPDF): number {
-  return doc.getFontSize() * 1.5;
+  return doc.getFontSize() * 0.35; // Adjusted to be more proportional to font size
 }
 
-// Simple function to check if we need a page break
+// Enhanced function to check if we need a page break with better content flow
 export function checkForPageBreak(doc: jsPDF, currentY: number, contentHeight: number): number {
   if (currentY + contentHeight > MAX_Y) {
     doc.addPage();
@@ -36,7 +36,7 @@ export function checkForPageBreak(doc: jsPDF, currentY: number, contentHeight: n
   return currentY;
 }
 
-// Aggiunge testo con gestione automatica delle pagine
+// Improved text handling with automatic page breaks
 export function addAutoPagingText(
   doc: jsPDF,
   text: string,
@@ -45,35 +45,41 @@ export function addAutoPagingText(
   options?: {
     maxWidth?: number,
     fontStyle?: 'normal' | 'bold' | 'italic',
-    fontSize?: keyof typeof FONT_SIZES
+    fontSize?: keyof typeof FONT_SIZES,
+    lineSpacing?: number
   }
 ): number {
   const originalFontSize = doc.getFontSize();
+  const originalFontStyle = doc.getFont().fontStyle;
   const maxWidth = options?.maxWidth || CONTENT_WIDTH;
+  const lineSpacing = options?.lineSpacing || 1.2;
   
-  // Applica stili temporanei se specificati
+  // Apply temporary styles if specified
   if (options?.fontSize) doc.setFontSize(FONT_SIZES[options.fontSize]);
   if (options?.fontStyle) doc.setFont(doc.getFont().fontName, options.fontStyle);
 
-  const lineHeight = getLineHeight(doc);
+  // Calculate dynamic line height based on current font size
+  const lineHeight = doc.getFontSize() * lineSpacing;
   const lines = doc.splitTextToSize(text, maxWidth);
 
+  let currentY = y;
+  
   for (const line of lines) {
-    // Controllo avanzato per pagina piena
-    if (y + lineHeight > MAX_Y) {
+    // Proactive page break check
+    if (currentY + lineHeight > MAX_Y) {
       doc.addPage();
-      y = DOCUMENT_MARGINS.top;
+      currentY = DOCUMENT_MARGINS.top;
     }
 
-    doc.text(line, x, y);
-    y += lineHeight;
+    doc.text(line, x, currentY);
+    currentY += lineHeight;
   }
 
-  // Ripristina stili originali
+  // Restore original styles
   doc.setFontSize(originalFontSize);
-  doc.setFont(doc.getFont().fontName, 'normal');
+  doc.setFont(doc.getFont().fontName, originalFontStyle);
   
-  return y;
+  return currentY;
 }
 
 export function setupDocumentProperties(doc: jsPDF, options: {
@@ -93,6 +99,7 @@ export function setupDocumentProperties(doc: jsPDF, options: {
   doc.setFontSize(FONT_SIZES.normal);
 }
 
+// Enhanced footer function that updates on all pages
 export function addFooter(doc: jsPDF, programName: string) {
   const pageCount = doc.getNumberOfPages();
   const footerY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom + 2;
@@ -105,7 +112,7 @@ export function addFooter(doc: jsPDF, programName: string) {
     doc.setFont("helvetica", "italic");
     doc.setTextColor(100);
     
-    // Linea separatrice
+    // Separator line
     doc.setDrawColor(80);
     doc.setLineWidth(0.5);
     doc.line(
@@ -115,17 +122,17 @@ export function addFooter(doc: jsPDF, programName: string) {
       PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 5
     );
     
-    // Testo footer
+    // Footer text
     doc.text(programName, DOCUMENT_MARGINS.left, footerY);
     
-    // Numero pagina
+    // Page number
     const pageText = `Pagina ${i} di ${pageCount}`;
     const textWidth = doc.getTextWidth(pageText);
     doc.text(pageText, pageWidth - textWidth - DOCUMENT_MARGINS.right, footerY);
   }
 }
 
-// Nuova funzione per iniziare nuovi blocchi di contenuto
+// Content block with automatic page breaks
 export function startNewContentBlock(doc: jsPDF, y: number, spacing: number = 10): number {
   let newY = y + spacing;
   

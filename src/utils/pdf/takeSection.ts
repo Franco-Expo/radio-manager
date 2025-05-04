@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Take } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, addAutoPagingText } from './documentStyles';
 import { renderSongs } from './songSection';
 
 export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
@@ -41,10 +41,10 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
       y += 7;
     }
     
-    // Render songs for this take
+    // Render songs for this take with improved text flow
     y = renderSongs(doc, take.songs, y);
     
     // Space between takes
-    y += 8; // Space between takes
+    y += 8;
   }
 }

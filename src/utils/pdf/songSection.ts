@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Song } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, addAutoPagingText } from './documentStyles';
 
 export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   let y = startY;
@@ -32,34 +32,30 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     // Format: Number. Title - Artist
     const titleText = song.title || "Titolo non specificato";
     const artistText = song.artist ? ` - ${song.artist}` : "";
+    const songHeaderText = `${i + 1}. ${titleText}${artistText}`;
     const songHeaderHeight = 7;
     
     // Check for page break before drawing the song title
     y = checkForPageBreak(doc, y, songHeaderHeight);
-    doc.text(`${i + 1}. ${titleText}${artistText}`, DOCUMENT_MARGINS.left + 10, y);
+    doc.text(songHeaderText, DOCUMENT_MARGINS.left + 10, y);
     
-    // Move down just slightly for news (eliminating empty space)
+    // Move down slightly for news, minimizing space
     y += 4;
     
-    // Add news
+    // Add news with optimized text flow
     if (song.news && song.news.trim()) {
+      // Use the enhanced text rendering function for news
       doc.setFontSize(FONT_SIZES.normal);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(40);
       
-      // Split text to respect margins
       const maxWidth = doc.internal.pageSize.width - DOCUMENT_MARGINS.left - DOCUMENT_MARGINS.right - 15;
-      const splitText = doc.splitTextToSize(song.news, maxWidth);
       
-      // Calculate news text height
-      const newsHeight = splitText.length * 5;
-      
-      // Check for page break before drawing the news
-      y = checkForPageBreak(doc, y, newsHeight);
-      doc.text(splitText, DOCUMENT_MARGINS.left + 15, y);
-      
-      // Update Y position based on number of lines
-      y += newsHeight;
+      // Use the enhanced automatic paging text function
+      y = addAutoPagingText(doc, song.news, DOCUMENT_MARGINS.left + 15, y, {
+        maxWidth: maxWidth,
+        lineSpacing: 1.1 // Slightly tighter spacing for news
+      });
     } else {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
