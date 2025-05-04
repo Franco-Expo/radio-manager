@@ -40,7 +40,7 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
   doc.setFontSize(FONT_SIZES.small);
   doc.setTextColor(80);
   doc.text(`Generato il: ${new Date().toLocaleDateString('it-IT')}`, DOCUMENT_MARGINS.left, y);
-  y += 6; // Reduced from 8
+  y += 14; // Reduced from 8
   
   return y; // Return the new Y position
 }
