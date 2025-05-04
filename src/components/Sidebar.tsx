@@ -5,12 +5,6 @@ import { ProgramItem } from "./ProgramItem";
 import { Menu, Radio } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
 
 type Program = {
   id: string;
@@ -66,13 +60,6 @@ export function Sidebar({
     }
   };
 
-  // Handle deletion of a published program
-  const handlePublishedProgramDelete = (programId: string) => {
-    if (confirm("Sei sicuro di voler cancellare questo programma pubblicato?")) {
-      onProgramDelete(programId);
-    }
-  };
-  
   return (
     <div className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full ${isCollapsed ? 'w-16' : 'w-64'}`}>
       <div className="p-4 border-b flex items-center justify-between bg-sidebar">
@@ -93,30 +80,19 @@ export function Sidebar({
           <ScrollArea className="h-auto max-h-[25vh] pr-2">
             <div className="space-y-1 pr-2">
               {publishedPrograms.map((program) => (
-                <ContextMenu key={`pub-${program.id}`}>
-                  <ContextMenuTrigger>
-                    <div 
-                      className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
-                      onClick={() => {
-                        console.log(`Clicking published program: ${program.name}`);
-                        onProgramClick(program.id);
-                      }}
-                    >
-                      <span>{program.name}</span>
-                      <span className="text-muted-foreground">
-                        {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
-                      </span>
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem 
-                      className="text-destructive focus:text-destructive"
-                      onClick={() => handlePublishedProgramDelete(program.id)}
-                    >
-                      Cancella
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
+                <div 
+                  key={`pub-${program.id}`}
+                  className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
+                  onClick={() => {
+                    console.log(`Clicking published program: ${program.name}`);
+                    onProgramClick(program.id);
+                  }}
+                >
+                  <span>{program.name}</span>
+                  <span className="text-muted-foreground">
+                    {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
+                  </span>
+                </div>
               ))}
             </div>
           </ScrollArea>
