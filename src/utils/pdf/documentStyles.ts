@@ -26,9 +26,6 @@ export const CONTENT_HEIGHT = PAGE_HEIGHT - DOCUMENT_MARGINS.top - DOCUMENT_MARG
 // Line height to be used for calculations
 export const LINE_HEIGHT = 5;
 
-// Line number from bottom for forced page break (40 lines from bottom - changed from 49)
-export const FORCE_BREAK_LINE = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - (5 * LINE_HEIGHT);
-
 // Configure document properties
 export function setupDocumentProperties(doc: jsPDF, options: {
   title: string;
@@ -79,13 +76,7 @@ export function addFooter(doc: jsPDF, programName: string) {
 
 // Helper function to check if there's enough space on the current page
 export function checkForPageBreak(doc: jsPDF, y: number, requiredHeight: number): number {
-  // Check if we've reached the forced break line
-  if (y >= FORCE_BREAK_LINE) {
-    doc.addPage();
-    return DOCUMENT_MARGINS.top;
-  }
-  
-  // Also keep the original functionality to check for space
+  // Check if we need a page break based on available space
   const maxY = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
   
   if (y + requiredHeight > maxY) {

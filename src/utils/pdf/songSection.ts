@@ -1,7 +1,7 @@
 
 import { jsPDF } from 'jspdf';
 import { Song } from '@/types/takes';
-import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak, FORCE_BREAK_LINE } from './documentStyles';
+import { FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './documentStyles';
 
 export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   let y = startY;
@@ -24,12 +24,6 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
   // Loop through each song
   for (let i = 0; i < sortedSongs.length; i++) {
     const song = sortedSongs[i];
-    
-    // Check if we need to force a page break at line 49 from bottom
-    if (y >= FORCE_BREAK_LINE) {
-      doc.addPage();
-      y = DOCUMENT_MARGINS.top;
-    }
     
     // Song title with artist
     doc.setFontSize(FONT_SIZES.normal);
