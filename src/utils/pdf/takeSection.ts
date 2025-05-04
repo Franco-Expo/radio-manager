@@ -31,7 +31,7 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
     doc.text(`Take ${String(take.number).padStart(2, '0')}`, DOCUMENT_MARGINS.left, y);
-    y += 4; // Reduced from 5
+    y += 6; // Reduced from 5
     
     if (take.date) {
       doc.setFontSize(FONT_SIZES.small);
