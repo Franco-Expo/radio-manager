@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FileText, FilePlus, Trash2 } from "lucide-react";
+import { CalendarIcon, FileText, FilePlus, Trash2, X } from "lucide-react";
 
 type Program = {
   id: string;
@@ -46,6 +46,10 @@ export function ProgramItem({
     if (confirm("Sei sicuro di voler cancellare questo programma e tutte le sue take?")) {
       onDelete();
     }
+  };
+
+  const handleClearPublishDate = () => {
+    onPublishDateChange(null);
   };
 
   const handleCreateTake = (e: React.MouseEvent) => {
@@ -101,6 +105,15 @@ export function ProgramItem({
           <FileText className="h-4 w-4" />
           Salva come PDF
         </ContextMenuItem>
+        {program.publishDate && (
+          <ContextMenuItem 
+            onClick={handleClearPublishDate}
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
+            Cancella data pubblicazione
+          </ContextMenuItem>
+        )}
         <ContextMenuItem 
           className="text-destructive focus:text-destructive flex items-center gap-2" 
           onClick={handleDelete}
