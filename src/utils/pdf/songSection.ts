@@ -39,7 +39,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     doc.text(`${i + 1}. ${titleText}${artistText}`, DOCUMENT_MARGINS.left + 10, y);
     
     // Move down just slightly for news (eliminating empty space)
-    y += 4; // Reduced even further to minimize space between title and news
+    y += 4;
     
     // Add news
     if (song.news && song.news.trim()) {
@@ -72,8 +72,8 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     }
     
     // Minimal space between songs
-    y += 3; // Reduced even further to minimize space between songs
+    y += 3;
   }
   
-  return y; // Return the updated Y position
+  return y;
 }

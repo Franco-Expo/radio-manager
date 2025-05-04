@@ -27,6 +27,15 @@ export function getLineHeight(doc: jsPDF): number {
   return doc.getFontSize() * 1.5;
 }
 
+// Simple function to check if we need a page break
+export function checkForPageBreak(doc: jsPDF, currentY: number, contentHeight: number): number {
+  if (currentY + contentHeight > MAX_Y) {
+    doc.addPage();
+    return DOCUMENT_MARGINS.top;
+  }
+  return currentY;
+}
+
 // Aggiunge testo con gestione automatica delle pagine
 export function addAutoPagingText(
   doc: jsPDF,
