@@ -16,7 +16,7 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
   const titleX = (doc.internal.pageSize.width - titleWidth) / 2;
   
   doc.text(program.name, titleX, y);
-  y += 6; // Reduced from 8
+  y += 9; // Reduced from 8
   
   // Stylized divider at the top
   doc.setDrawColor(80);
