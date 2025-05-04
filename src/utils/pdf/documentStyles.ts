@@ -23,7 +23,7 @@ const MAX_Y = PAGE_HEIGHT - DOCUMENT_MARGINS.bottom - 10;
 
 // Calcola l'altezza della linea in base alla dimensione del font
 export function getLineHeight(doc: jsPDF): number {
-  return doc.getFontSize() * 0.20; // Reduced from 0.35 to make line spacing tighter
+  return doc.getFontSize() * 0.30; // Reduced from 0.35 to make line spacing tighter
 }
 
 // Enhanced function to check if we need a page break with better content flow
@@ -51,7 +51,7 @@ export function addAutoPagingText(
   const originalFontSize = doc.getFontSize();
   const originalFontStyle = doc.getFont().fontStyle;
   const maxWidth = options?.maxWidth || CONTENT_WIDTH;
-  const lineSpacing = options?.lineSpacing || 0.5; // Reduced from 1.2 to make text more compact
+  const lineSpacing = options?.lineSpacing || 0.4; // Reduced from 1.2 to make text more compact
   
   // Apply temporary styles if specified
   if (options?.fontSize) doc.setFontSize(FONT_SIZES[options.fontSize]);
