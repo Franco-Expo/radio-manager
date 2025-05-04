@@ -38,8 +38,8 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     y = checkForPageBreak(doc, y, songHeaderHeight);
     doc.text(`${i + 1}. ${titleText}${artistText}`, DOCUMENT_MARGINS.left + 10, y);
     
-    // Move down for news (with an empty line in between)
-    y += 7; // This creates the empty line between title and news
+    // Move down for news (without empty line in between)
+    y += 5; // Reduced from 7 to avoid unnecessary spacing
     
     // Add news
     if (song.news && song.news.trim()) {
@@ -59,7 +59,7 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       doc.text(splitText, DOCUMENT_MARGINS.left + 15, y);
       
       // Update Y position based on number of lines
-      y += newsHeight + 2;
+      y += newsHeight;
     } else {
       doc.setFontSize(FONT_SIZES.small);
       doc.setFont("helvetica", "italic");
@@ -68,11 +68,11 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
       // Check for page break
       y = checkForPageBreak(doc, y, 7);
       doc.text("Nessuna notizia", DOCUMENT_MARGINS.left + 15, y);
-      y += 7;
+      y += 5; // Reduced from 7
     }
     
     // Space between songs
-    y += 7;
+    y += 5; // Reduced from 7 to remove empty spaces
   }
   
   return y; // Return the updated Y position
