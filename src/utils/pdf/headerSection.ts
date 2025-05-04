@@ -34,7 +34,7 @@ export function addProgramHeader(doc: jsPDF, program: Program): number {
     : "Data di pubblicazione non disponibile";
   
   doc.text(pubDateText, DOCUMENT_MARGINS.left, y);
-  y += 3; // Reduced from 4
+  y += 6; // Reduced from 4
   
   // Generation date
   doc.setFontSize(FONT_SIZES.small);
