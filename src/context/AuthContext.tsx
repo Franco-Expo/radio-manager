@@ -124,8 +124,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    // After logout, the onAuthStateChange listener will update the state
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Logout error:", error);
+        throw error;
+      }
+      // We don't need to manually update state here as the onAuthStateChange listener will handle it
+    } catch (error) {
+      console.error("Error during logout:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
