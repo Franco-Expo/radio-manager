@@ -21,7 +21,7 @@ export function renderTakes(doc: jsPDF, takes: Take[], startY: number): void {
   // Loop through each take
   for (const take of sortedTakes) {
     // Estimate height needed for take header
-    const takeHeaderHeight = 10; // Reduced from 12
+    const takeHeaderHeight = 14; // Reduced from 12
     
     // Check if we need a page break for the take header
     y = checkForPageBreak(doc, y, takeHeaderHeight);
