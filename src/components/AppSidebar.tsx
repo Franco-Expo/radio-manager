@@ -54,7 +54,7 @@ export function AppSidebar({
             <Menu className="h-5 w-5" />
             <span className="font-medium">Radio Manager</span>
           </div>
-          <SidebarTrigger className="flex md:flex"/>
+          <SidebarTrigger className="flex h-8 w-8 items-center justify-center rounded-md border bg-background hover:bg-accent hover:text-accent-foreground" />
         </div>
       </SidebarHeader>
       

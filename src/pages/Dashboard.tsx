@@ -10,10 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 import { generateProgramPdf } from "@/utils/pdfGenerator";
 import { usePrograms } from "@/hooks/usePrograms";
 import { useTakes } from "@/hooks/useTakes";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
-import { SidebarProvider, SidebarInset, SidebarRail } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
@@ -187,24 +188,32 @@ const Dashboard = () => {
           />
           <SidebarRail />
           <SidebarInset className="flex-1 overflow-y-auto">
-            {takesLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">Caricamento takes...</span>
-              </div>
-            ) : (
-              <ProgramCreation
-                programs={programs}
-                takes={takes}
-                onProgramCreate={handleCreateProgram}
-                onProgramUpdate={handleUpdateProgram}
-                selectedProgramId={selectedProgramId}
-                onTakeCreate={createTake}
-                onTakeUpdate={updateTake}
-                onTakeDelete={deleteTake}
-                onProgramSave={saveProgram}
-              />
-            )}
+            <div className="p-4">
+              <Button variant="outline" size="icon" className="md:hidden mb-4" asChild>
+                <SidebarTrigger>
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Toggle Sidebar</span>
+                </SidebarTrigger>
+              </Button>
+              {takesLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2">Caricamento takes...</span>
+                </div>
+              ) : (
+                <ProgramCreation
+                  programs={programs}
+                  takes={takes}
+                  onProgramCreate={handleCreateProgram}
+                  onProgramUpdate={handleUpdateProgram}
+                  selectedProgramId={selectedProgramId}
+                  onTakeCreate={createTake}
+                  onTakeUpdate={updateTake}
+                  onTakeDelete={deleteTake}
+                  onProgramSave={saveProgram}
+                />
+              )}
+            </div>
           </SidebarInset>
         </div>
       </SidebarProvider>
