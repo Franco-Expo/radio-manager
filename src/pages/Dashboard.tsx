@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Sidebar } from "@/components/Sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import { ProgramCreation } from "@/components/programs/ProgramCreation";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { usePrograms } from "@/hooks/usePrograms";
 import { useTakes } from "@/hooks/useTakes";
 import { Loader2 } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
@@ -173,36 +174,38 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          programs={programs}
-          onProgramClick={handleProgramClick}
-          onProgramDelete={deleteProgram}
-          onPublishDateChange={updateProgramPublishDate}
-          onExportPdf={handleExportToPdf}
-          onCreateTake={handleCreateTake}
-        />
-        <main className="flex-1 overflow-y-auto pl-16 md:pl-0">
-          {takesLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <span className="ml-2">Caricamento takes...</span>
-            </div>
-          ) : (
-            <ProgramCreation
-              programs={programs}
-              takes={takes}
-              onProgramCreate={handleCreateProgram}
-              onProgramUpdate={handleUpdateProgram}
-              selectedProgramId={selectedProgramId}
-              onTakeCreate={createTake}
-              onTakeUpdate={updateTake}
-              onTakeDelete={deleteTake}
-              onProgramSave={saveProgram}
-            />
-          )}
-        </main>
-      </div>
+      <SidebarProvider defaultOpen={!isMobile}>
+        <div className="flex flex-1 overflow-hidden">
+          <AppSidebar
+            programs={programs}
+            onProgramClick={handleProgramClick}
+            onProgramDelete={deleteProgram}
+            onPublishDateChange={updateProgramPublishDate}
+            onExportPdf={handleExportToPdf}
+            onCreateTake={handleCreateTake}
+          />
+          <SidebarInset className="flex-1 overflow-y-auto">
+            {takesLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2">Caricamento takes...</span>
+              </div>
+            ) : (
+              <ProgramCreation
+                programs={programs}
+                takes={takes}
+                onProgramCreate={handleCreateProgram}
+                onProgramUpdate={handleUpdateProgram}
+                selectedProgramId={selectedProgramId}
+                onTakeCreate={createTake}
+                onTakeUpdate={updateTake}
+                onTakeDelete={deleteTake}
+                onProgramSave={saveProgram}
+              />
+            )}
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
       <Footer />
     </div>
   );
