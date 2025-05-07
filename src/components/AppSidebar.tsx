@@ -47,6 +47,7 @@ export function AppSidebar({
       collapsible="icon" 
       variant="sidebar"
       side="left"
+      className="h-[calc(100vh-4rem)]" // Adjust height to leave room for footer
     >
       <SidebarHeader>
         <div className="flex items-center justify-between p-2">

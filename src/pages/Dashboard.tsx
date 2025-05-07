@@ -176,47 +176,49 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col h-screen">
       <Header />
-      <SidebarProvider defaultOpen={!isMobile}>
-        <div className="flex flex-1 overflow-hidden group/sidebar-wrapper">
-          <AppSidebar
-            programs={programs}
-            onProgramClick={handleProgramClick}
-            onProgramDelete={deleteProgram}
-            onPublishDateChange={updateProgramPublishDate}
-            onExportPdf={handleExportToPdf}
-            onCreateTake={handleCreateTake}
-          />
-          <SidebarRail />
-          <SidebarInset className="flex-1 overflow-y-auto">
-            <div className="p-4">
-              <Button variant="outline" size="icon" className="md:hidden mb-4" asChild>
-                <SidebarTrigger>
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle Sidebar</span>
-                </SidebarTrigger>
-              </Button>
-              {takesLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <span className="ml-2">Caricamento takes...</span>
-                </div>
-              ) : (
-                <ProgramCreation
-                  programs={programs}
-                  takes={takes}
-                  onProgramCreate={handleCreateProgram}
-                  onProgramUpdate={handleUpdateProgram}
-                  selectedProgramId={selectedProgramId}
-                  onTakeCreate={createTake}
-                  onTakeUpdate={updateTake}
-                  onTakeDelete={deleteTake}
-                  onProgramSave={saveProgram}
-                />
-              )}
-            </div>
-          </SidebarInset>
-        </div>
-      </SidebarProvider>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <SidebarProvider defaultOpen={!isMobile}>
+          <div className="flex flex-1 overflow-hidden group/sidebar-wrapper">
+            <AppSidebar
+              programs={programs}
+              onProgramClick={handleProgramClick}
+              onProgramDelete={deleteProgram}
+              onPublishDateChange={updateProgramPublishDate}
+              onExportPdf={handleExportToPdf}
+              onCreateTake={handleCreateTake}
+            />
+            <SidebarRail />
+            <SidebarInset className="flex-1 overflow-y-auto">
+              <div className="p-4">
+                <Button variant="outline" size="icon" className="md:hidden mb-4" asChild>
+                  <SidebarTrigger>
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Sidebar</span>
+                  </SidebarTrigger>
+                </Button>
+                {takesLoading ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <span className="ml-2">Caricamento takes...</span>
+                  </div>
+                ) : (
+                  <ProgramCreation
+                    programs={programs}
+                    takes={takes}
+                    onProgramCreate={handleCreateProgram}
+                    onProgramUpdate={handleUpdateProgram}
+                    selectedProgramId={selectedProgramId}
+                    onTakeCreate={createTake}
+                    onTakeUpdate={updateTake}
+                    onTakeDelete={deleteTake}
+                    onProgramSave={saveProgram}
+                  />
+                )}
+              </div>
+            </SidebarInset>
+          </div>
+        </SidebarProvider>
+      </div>
       <Footer />
     </div>
   );
