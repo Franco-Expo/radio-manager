@@ -39,6 +39,7 @@ export function AppSidebar({
     publishedSearchQuery,
     setPublishedSearchQuery,
     isMobile,
+    toggleSidebar
   } = useSidebarState();
 
   return (
@@ -53,7 +54,7 @@ export function AppSidebar({
             <Menu className="h-5 w-5" />
             <span className="font-medium">Radio Manager</span>
           </div>
-          <SidebarTrigger/>
+          <SidebarTrigger className="flex md:flex"/>
         </div>
       </SidebarHeader>
       

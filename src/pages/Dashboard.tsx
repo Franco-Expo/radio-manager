@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -11,7 +12,7 @@ import { usePrograms } from "@/hooks/usePrograms";
 import { useTakes } from "@/hooks/useTakes";
 import { Loader2 } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarRail } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
@@ -175,7 +176,7 @@ const Dashboard = () => {
     <div className="flex flex-col h-screen">
       <Header />
       <SidebarProvider defaultOpen={!isMobile}>
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden group/sidebar-wrapper">
           <AppSidebar
             programs={programs}
             onProgramClick={handleProgramClick}
@@ -184,6 +185,7 @@ const Dashboard = () => {
             onExportPdf={handleExportToPdf}
             onCreateTake={handleCreateTake}
           />
+          <SidebarRail />
           <SidebarInset className="flex-1 overflow-y-auto">
             {takesLoading ? (
               <div className="flex items-center justify-center h-full">

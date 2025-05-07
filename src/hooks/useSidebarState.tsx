@@ -8,17 +8,23 @@ export function useSidebarState() {
   const [publishedSearchQuery, setPublishedSearchQuery] = useState("");
   const isMobile = useIsMobile();
   
-  // We could use the builtin sidebar state from shadcn, but this approach
-  // maintains backward compatibility with the existing components
+  // We use the shadcn sidebar context
   let sidebarState = { 
     open: true, 
     setOpen: (value: boolean) => {}, 
-    state: "expanded" as "expanded" | "collapsed" 
+    state: "expanded" as "expanded" | "collapsed",
+    toggleSidebar: () => {}
   };
   
   try {
     // Try to use the shadcn sidebar context if available
-    sidebarState = useSidebar();
+    const sidebar = useSidebar();
+    sidebarState = {
+      open: sidebar.open,
+      setOpen: sidebar.setOpen,
+      state: sidebar.state,
+      toggleSidebar: sidebar.toggleSidebar
+    };
   } catch (error) {
     // Fallback to default values if not in context
     console.log("Using default sidebar state");
@@ -31,7 +37,7 @@ export function useSidebarState() {
   };
   
   const toggleSidebar = () => {
-    sidebarState.setOpen(!sidebarState.open);
+    sidebarState.toggleSidebar();
   };
 
   return {
