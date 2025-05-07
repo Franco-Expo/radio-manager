@@ -74,6 +74,10 @@ export function Sidebar({
     }
   };
 
+  // Take only the first 4 items for initial display
+  const visiblePublishedPrograms = filteredPublishedPrograms.slice(0, 4);
+  const hasMorePublishedPrograms = filteredPublishedPrograms.length > 4;
+
   return (
     <div 
       className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full fixed md:relative z-40 ${
@@ -115,11 +119,11 @@ export function Sidebar({
             <h3 className="text-sm font-medium flex-1">Pubblicazione</h3>
           </div>
           
-          {/* Moved search field under the "Pubblicazione" title */}
+          {/* Updated placeholder text for pubblicazione search field */}
           <div className="flex items-center mb-3">
             <Search className="h-4 w-4 text-muted-foreground mr-1" />
             <Input 
-              placeholder="Cerca..." 
+              placeholder="Cerca pubblicazione..." 
               className="h-7 text-xs" 
               value={publishedSearchQuery}
               onChange={(e) => setPublishedSearchQuery(e.target.value)}
@@ -127,26 +131,49 @@ export function Sidebar({
             />
           </div>
           
-          <ScrollArea className="h-auto max-h-[25vh] pr-2">
-            <div className="space-y-1 pr-2">
-              {filteredPublishedPrograms.map((program) => (
-                <div 
-                  key={`pub-${program.id}`}
-                  className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
-                  onClick={() => {
-                    console.log(`Clicking published program: ${program.name}`);
-                    onProgramClick(program.id);
-                    if (isMobile) setIsCollapsed(true);
-                  }}
-                >
-                  <span>{program.name}</span>
-                  <span className="text-muted-foreground">
-                    {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
+          {/* Display first 4 items without scroll */}
+          <div className="space-y-1 pr-2">
+            {visiblePublishedPrograms.map((program) => (
+              <div 
+                key={`pub-${program.id}`}
+                className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
+                onClick={() => {
+                  console.log(`Clicking published program: ${program.name}`);
+                  onProgramClick(program.id);
+                  if (isMobile) setIsCollapsed(true);
+                }}
+              >
+                <span>{program.name}</span>
+                <span className="text-muted-foreground">
+                  {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
+                </span>
+              </div>
+            ))}
+          </div>
+          
+          {/* Show ScrollArea only if there are more than 4 items */}
+          {hasMorePublishedPrograms && (
+            <ScrollArea className="h-auto max-h-[20vh] pr-2 mt-1">
+              <div className="space-y-1 pr-2">
+                {filteredPublishedPrograms.slice(4).map((program) => (
+                  <div 
+                    key={`pub-${program.id}`}
+                    className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
+                    onClick={() => {
+                      console.log(`Clicking published program: ${program.name}`);
+                      onProgramClick(program.id);
+                      if (isMobile) setIsCollapsed(true);
+                    }}
+                  >
+                    <span>{program.name}</span>
+                    <span className="text-muted-foreground">
+                      {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
         </div>
       )}
       
