@@ -14,7 +14,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <div className="flex-1 flex overflow-hidden">
         <SidebarProvider defaultOpen={!isMobile}>
@@ -25,7 +25,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             onPublishDateChange={() => {}} 
             onExportPdf={() => {}}
           />
-          <main className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 flex flex-col overflow-y-auto">
             {children}
           </main>
         </SidebarProvider>
