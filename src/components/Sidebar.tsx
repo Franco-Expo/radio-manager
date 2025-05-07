@@ -80,7 +80,7 @@ export function Sidebar({
 
   return (
     <div 
-      className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full fixed md:relative z-40 ${
+      className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-[calc(100vh-8rem)] fixed md:relative z-40 ${
         isCollapsed ? 'w-16' : 'w-64'
       }`}
     >
@@ -227,6 +227,19 @@ export function Sidebar({
             </div>
           </ScrollArea>
         </div>
+      )}
+      
+      {/* Collapse button when sidebar is collapsed */}
+      {isCollapsed && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="absolute -right-10 top-2 opacity-100 hover:bg-sidebar-accent w-8 h-8"
+          aria-label="Expand Sidebar"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
       )}
     </div>
   );

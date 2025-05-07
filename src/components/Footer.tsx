@@ -7,10 +7,10 @@ export function Footer() {
     formattedTime
   } = useDateTime();
   const isMobile = useIsMobile();
-  return <footer className="w-full py-2 px-4 md:py-3 md:px-6 border-t bg-background mt-auto">
+  return <footer className="w-full py-2 px-4 md:py-3 md:px-6 border-t bg-background mt-auto z-10">
       <div className="flex flex-col md:flex-row justify-between items-center gap-2 text-center md:text-left">
         <div className="text-xs md:text-sm font-medium">
-          {APP_NAME} <a href="https://studionet4.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline px-0">Radio Manager Pro        Dev by Studionet4.com</a>
+          {APP_NAME} <a href="https://studionet4.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline px-[30px]">Dev by Studionet4.com</a>
         </div>
         {isMobile ? <div className="text-xs text-muted-foreground">
             {formattedDate} | {formattedTime}
