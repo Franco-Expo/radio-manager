@@ -74,9 +74,9 @@ export function Sidebar({
     }
   };
 
-  // Take only the first 4 items for initial display
-  const visiblePublishedPrograms = filteredPublishedPrograms.slice(0, 4);
-  const hasMorePublishedPrograms = filteredPublishedPrograms.length > 4;
+  // Take only the first 2 items for initial display - reduced from 4 to 2
+  const visiblePublishedPrograms = filteredPublishedPrograms.slice(0, 2);
+  const hasMorePublishedPrograms = filteredPublishedPrograms.length > 2;
 
   return (
     <div 
@@ -113,13 +113,13 @@ export function Sidebar({
         )}
       </div>
       
-      {!isCollapsed && filteredPublishedPrograms.length > 0 && (
+      {/* Always show the pubblicazione section when sidebar is expanded, even if no results */}
+      {!isCollapsed && (
         <div className="p-4 border-b flex flex-col">
           <div className="flex items-center mb-2">
             <h3 className="text-sm font-medium flex-1">Pubblicazione</h3>
           </div>
           
-          {/* Updated placeholder text for pubblicazione search field */}
           <div className="flex items-center mb-3">
             <Search className="h-4 w-4 text-muted-foreground mr-1" />
             <Input 
@@ -131,31 +131,11 @@ export function Sidebar({
             />
           </div>
           
-          {/* Display first 4 items without scroll */}
-          <div className="space-y-1 pr-2">
-            {visiblePublishedPrograms.map((program) => (
-              <div 
-                key={`pub-${program.id}`}
-                className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
-                onClick={() => {
-                  console.log(`Clicking published program: ${program.name}`);
-                  onProgramClick(program.id);
-                  if (isMobile) setIsCollapsed(true);
-                }}
-              >
-                <span>{program.name}</span>
-                <span className="text-muted-foreground">
-                  {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
-                </span>
-              </div>
-            ))}
-          </div>
-          
-          {/* Show ScrollArea only if there are more than 4 items */}
-          {hasMorePublishedPrograms && (
-            <ScrollArea className="h-auto max-h-[20vh] pr-2 mt-1">
+          {/* Display first 2 items without scroll */}
+          {filteredPublishedPrograms.length > 0 ? (
+            <>
               <div className="space-y-1 pr-2">
-                {filteredPublishedPrograms.slice(4).map((program) => (
+                {visiblePublishedPrograms.map((program) => (
                   <div 
                     key={`pub-${program.id}`}
                     className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
@@ -172,7 +152,35 @@ export function Sidebar({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+              
+              {/* Show ScrollArea if there are more than 2 items */}
+              {hasMorePublishedPrograms && (
+                <ScrollArea className="h-auto max-h-[15vh] pr-2 mt-1">
+                  <div className="space-y-1 pr-2">
+                    {filteredPublishedPrograms.slice(2).map((program) => (
+                      <div 
+                        key={`pub-${program.id}`}
+                        className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
+                        onClick={() => {
+                          console.log(`Clicking published program: ${program.name}`);
+                          onProgramClick(program.id);
+                          if (isMobile) setIsCollapsed(true);
+                        }}
+                      >
+                        <span>{program.name}</span>
+                        <span className="text-muted-foreground">
+                          {program.publishDate ? new Date(program.publishDate).toLocaleDateString('it-IT') : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              )}
+            </>
+          ) : (
+            <div className="text-xs text-muted-foreground italic">
+              Nessuna pubblicazione trovata
+            </div>
           )}
         </div>
       )}
