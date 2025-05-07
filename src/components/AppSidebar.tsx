@@ -51,7 +51,7 @@ export function AppSidebar({
         <Button
           variant="outline"
           size="icon"
-          className="fixed top-20 left-2 z-20 rounded-full h-10 w-10 shadow-md md:flex hidden"
+          className="fixed top-20 left-2 z-20 rounded-full h-10 w-10 shadow-md md:flex hidden transition-opacity ease-in-out duration-300"
           onClick={toggleSidebar}
           title="Mostra sidebar"
         >

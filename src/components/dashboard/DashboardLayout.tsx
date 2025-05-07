@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AppSidebar } from "@/components/AppSidebar";
 
 type DashboardLayoutProps = {
   children: ReactNode;
