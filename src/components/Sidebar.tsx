@@ -1,10 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgramItem } from "./ProgramItem";
-import { Menu, Radio } from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, Radio } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Program = {
   id: string;
@@ -30,6 +31,14 @@ export function Sidebar({
   onCreateTake 
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const isMobile = useIsMobile();
+  
+  // Auto-collapse on mobile
+  useEffect(() => {
+    if (isMobile) {
+      setIsCollapsed(true);
+    }
+  }, [isMobile]);
   
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -61,17 +70,38 @@ export function Sidebar({
   };
 
   return (
-    <div className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full ${isCollapsed ? 'w-16' : 'w-64'}`}>
-      <div className="p-4 border-b flex items-center justify-between bg-sidebar">
+    <div 
+      className={`border-r bg-sidebar transition-all duration-300 flex flex-col h-full fixed md:relative z-40 ${
+        isCollapsed ? 'w-16' : 'w-64'
+      }`}
+    >
+      <div className="p-2 md:p-4 border-b flex items-center justify-between bg-sidebar">
         <Button 
           variant="ghost" 
           size="sm" 
           className="flex items-center gap-2" 
           onClick={toggleSidebar}
         >
-          <Menu className="h-5 w-5" />
-          {!isCollapsed && <span>Radio Manager</span>}
+          {isCollapsed ? (
+            <ChevronRight className="h-5 w-5" />
+          ) : (
+            <>
+              <Menu className="h-5 w-5" />
+              <span>Radio Manager</span>
+            </>
+          )}
         </Button>
+        
+        {!isCollapsed && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={toggleSidebar} 
+            className="md:hidden"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        )}
       </div>
       
       {!isCollapsed && publishedPrograms.length > 0 && (
@@ -86,6 +116,7 @@ export function Sidebar({
                   onClick={() => {
                     console.log(`Clicking published program: ${program.name}`);
                     onProgramClick(program.id);
+                    if (isMobile) setIsCollapsed(true);
                   }}
                 >
                   <span>{program.name}</span>
@@ -117,6 +148,7 @@ export function Sidebar({
                   onClick={() => {
                     console.log(`Clicking program: ${program.name}`);
                     onProgramClick(program.id);
+                    if (isMobile) setIsCollapsed(true);
                   }}
                   onDelete={() => onProgramDelete(program.id)}
                   onPublishDateChange={(date) => onPublishDateChange(program.id, date)}

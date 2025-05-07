@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -12,11 +13,13 @@ import type { Program } from '@/types/programs';
 import { useTakes } from "@/hooks/useTakes";
 import { Loader2 } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
   const [selectedProgramId, setSelectedProgramId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const { 
     programs, 
@@ -181,7 +184,7 @@ const Dashboard = () => {
           onExportPdf={handleExportToPdf}
           onCreateTake={handleCreateTake}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto pl-16 md:pl-0">
           {takesLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -205,6 +208,6 @@ const Dashboard = () => {
       <Footer />
     </div>
   );
-};
+}
 
 export default Dashboard;
