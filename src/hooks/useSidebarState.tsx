@@ -10,7 +10,11 @@ export function useSidebarState() {
   
   // We could use the builtin sidebar state from shadcn, but this approach
   // maintains backward compatibility with the existing components
-  let sidebarState = { open: true, setOpen: () => {}, state: "expanded" as const };
+  let sidebarState = { 
+    open: true, 
+    setOpen: (value: boolean) => {}, 
+    state: "expanded" as const 
+  };
   
   try {
     // Try to use the shadcn sidebar context if available

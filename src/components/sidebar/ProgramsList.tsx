@@ -3,6 +3,7 @@ import { Radio, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { ProgramItem } from "../ProgramItem";
+import { useSidebar } from "@/components/ui/sidebar";
 
 type Program = {
   id: string;
@@ -20,7 +21,6 @@ type ProgramsListProps = {
   onExportPdf: (programId: string) => void;
   onCreateTake?: (programId: string) => void;
   isMobile: boolean;
-  setIsCollapsed: (value: boolean) => void;
 };
 
 export function ProgramsList({
@@ -32,9 +32,11 @@ export function ProgramsList({
   onPublishDateChange,
   onExportPdf,
   onCreateTake,
-  isMobile,
-  setIsCollapsed
+  isMobile
 }: ProgramsListProps) {
+  // Get sidebar state from the shadcn sidebar context
+  const { setOpen } = useSidebar();
+  
   // Filter and sort programs by name, applying search filter
   const filteredPrograms = programs
     .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -83,7 +85,7 @@ export function ProgramsList({
               onClick={() => {
                 console.log(`Clicking program: ${program.name}`);
                 onProgramClick(program.id);
-                if (isMobile) setIsCollapsed(true);
+                if (isMobile) setOpen(false);
               }}
               onDelete={() => onProgramDelete(program.id)}
               onPublishDateChange={(date) => onPublishDateChange(program.id, date)}

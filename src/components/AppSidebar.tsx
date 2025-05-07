@@ -64,7 +64,6 @@ export function AppSidebar({
           onSearchChange={setPublishedSearchQuery}
           onProgramClick={onProgramClick}
           isMobile={isMobile}
-          setIsCollapsed={() => {}}
         />
         
         <ProgramsList 
@@ -77,7 +76,6 @@ export function AppSidebar({
           onExportPdf={onExportPdf}
           onCreateTake={onCreateTake}
           isMobile={isMobile}
-          setIsCollapsed={() => {}}
         />
       </SidebarContent>
     </Sidebar>

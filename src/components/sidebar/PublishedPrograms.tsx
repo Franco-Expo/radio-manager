@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { useSidebar } from "@/components/ui/sidebar";
 
 type Program = {
   id: string;
@@ -16,7 +17,6 @@ type PublishedProgramsProps = {
   onSearchChange: (value: string) => void;
   onProgramClick: (programId: string) => void;
   isMobile: boolean;
-  setIsCollapsed: (value: boolean) => void;
 };
 
 export function PublishedPrograms({
@@ -24,9 +24,11 @@ export function PublishedPrograms({
   searchQuery,
   onSearchChange,
   onProgramClick,
-  isMobile,
-  setIsCollapsed
+  isMobile
 }: PublishedProgramsProps) {
+  // Get sidebar state from the shadcn sidebar context
+  const { setOpen } = useSidebar();
+  
   // Filter published programs by search query and sort them
   const filteredPublishedPrograms = programs
     .filter(p => p.publishDate && p.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -69,7 +71,7 @@ export function PublishedPrograms({
                 onClick={() => {
                   console.log(`Clicking published program: ${program.name}`);
                   onProgramClick(program.id);
-                  if (isMobile) setIsCollapsed(true);
+                  if (isMobile) setOpen(false);
                 }}
               >
                 <span>{program.name}</span>
@@ -91,7 +93,7 @@ export function PublishedPrograms({
                     onClick={() => {
                       console.log(`Clicking published program: ${program.name}`);
                       onProgramClick(program.id);
-                      if (isMobile) setIsCollapsed(true);
+                      if (isMobile) setOpen(false);
                     }}
                   >
                     <span>{program.name}</span>
