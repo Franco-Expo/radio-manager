@@ -1,226 +1,69 @@
 
-import { useState, useEffect } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { AppSidebar } from "@/components/AppSidebar";
-import { ProgramCreation } from "@/components/programs/ProgramCreation";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { generateProgramPdf } from "@/utils/pdfGenerator";
-import { usePrograms } from "@/hooks/usePrograms";
-import { useTakes } from "@/hooks/useTakes";
-import { Loader2, Menu } from "lucide-react";
-import { toast as sonnerToast } from "sonner";
-import { SidebarProvider, SidebarInset, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { DashboardContent } from "@/components/dashboard/DashboardContent";
+import { useDashboardState } from "@/hooks/useDashboardState";
 
 const Dashboard = () => {
   const { isAuthenticated } = useAuth();
-  const [selectedProgramId, setSelectedProgramId] = useState<string | undefined>(undefined);
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
-  
-  const { 
-    programs, 
-    isLoading: programsLoading, 
-    createProgram, 
-    updateProgramPublishDate, 
-    deleteProgram,
-    saveProgram
-  } = usePrograms();
-  
   const {
+    selectedProgramId,
+    programs,
     takes,
-    isLoading: takesLoading,
+    programsLoading,
+    takesLoading,
+    handleCreateProgram,
+    handleUpdateProgram,
+    handleProgramClick,
+    handleCreateTake,
+    handleExportToPdf,
+    updateProgramPublishDate,
+    deleteProgram,
     createTake,
     updateTake,
-    deleteTake
-  } = useTakes(selectedProgramId);
-  
-  // Debugging for selectedProgramId changes
-  useEffect(() => {
-    console.log("Selected program ID changed:", selectedProgramId);
-  }, [selectedProgramId]);
-
-  // Debugging for takes loading
-  useEffect(() => {
-    console.log("Takes updated:", takes);
-  }, [takes]);
+    deleteTake,
+    saveProgram
+  } = useDashboardState();
   
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/auth" />;
   }
 
-  const handleCreateProgram = async (newProgram: { name: string; publishDate: Date | null }) => {
-    const createdProgram = await createProgram(newProgram.name);
-    if (createdProgram) {
-      console.log("Program created:", createdProgram);
-      setSelectedProgramId(createdProgram.id);
-      
-      // Create first take
-      const firstTake = await createTake(1);
-      console.log("First take created:", firstTake);
-    }
-    
-    return createdProgram;
-  };
-  
-  const handleUpdateProgram = (updatedProgram: { id: string; name: string; publishDate: Date | null }) => {
-    // Special case for reset action
-    if (updatedProgram.id === 'reset') {
-      setSelectedProgramId(undefined);
-      return;
-    }
-  };
-  
-  const handleProgramClick = (programId: string) => {
-    console.log("Program clicked with ID:", programId);
-    setSelectedProgramId(programId);
-    
-    // Provide UI feedback
-    const program = programs.find(p => p.id === programId);
-    if (program) {
-      sonnerToast.success(`Programma selezionato: ${program.name}`);
-    }
-  };
-  
-  const handleCreateTake = async (programId: string) => {
-    console.log("Creating new take for program ID:", programId);
-    
-    // First select the program
-    setSelectedProgramId(programId);
-    
-    // Find the highest take number to create the next one
-    const programTakes = takes.filter(take => take.number);
-    const nextTakeNumber = programTakes.length > 0 
-      ? Math.max(...programTakes.map(take => take.number)) + 1 
-      : 1;
-    
-    try {
-      const newTake = await createTake(nextTakeNumber);
-      if (newTake) {
-        sonnerToast.success(`Nuova Take ${nextTakeNumber} creata`);
-        console.log("New take created:", newTake);
-      }
-    } catch (error) {
-      console.error("Error creating new take:", error);
-      sonnerToast.error("Errore nella creazione della nuova take");
-    }
-  };
-  
-  const handleExportToPdf = (programId: string) => {
-    const program = programs.find(p => p.id === programId);
-    if (!program) {
-      toast({
-        title: "Errore",
-        description: "Programma non trovato",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Make sure we have the takes for this specific program
-    if (selectedProgramId !== programId) {
-      setSelectedProgramId(programId);
-      setTimeout(() => {
-        try {
-          generateProgramPdf(program, takes);
-          toast({
-            title: "PDF generato",
-            description: `Il programma "${program.name}" è stato salvato come PDF`,
-          });
-        } catch (error) {
-          toast({
-            title: "Errore",
-            description: "Si è verificato un errore durante la generazione del PDF",
-            variant: "destructive",
-          });
-          console.error("PDF generation error:", error);
-        }
-      }, 1000); // Give time for the takes to load
-    } else {
-      try {
-        generateProgramPdf(program, takes);
-        toast({
-          title: "PDF generato",
-          description: `Il programma "${program.name}" è stato salvato come PDF`,
-        });
-      } catch (error) {
-        toast({
-          title: "Errore",
-          description: "Si è verificato un errore durante la generazione del PDF",
-          variant: "destructive",
-        });
-        console.error("PDF generation error:", error);
-      }
-    }
-  };
-  
   // Show loading state
   if (programsLoading) {
     return (
-      <div className="flex flex-col h-screen">
-        <Header />
+      <DashboardLayout>
         <div className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2">Caricamento programmi...</span>
         </div>
-        <Footer />
-      </div>
+      </DashboardLayout>
     );
   }
   
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <SidebarProvider defaultOpen={!isMobile}>
-          <div className="flex flex-1 overflow-hidden group/sidebar-wrapper">
-            <AppSidebar
-              programs={programs}
-              onProgramClick={handleProgramClick}
-              onProgramDelete={deleteProgram}
-              onPublishDateChange={updateProgramPublishDate}
-              onExportPdf={handleExportToPdf}
-              onCreateTake={handleCreateTake}
-            />
-            <SidebarRail />
-            <SidebarInset className="flex-1 overflow-y-auto">
-              <div className="p-4">
-                <Button variant="outline" size="icon" className="md:hidden mb-4" asChild>
-                  <SidebarTrigger>
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle Sidebar</span>
-                  </SidebarTrigger>
-                </Button>
-                {takesLoading ? (
-                  <div className="flex items-center justify-center h-full">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <span className="ml-2">Caricamento takes...</span>
-                  </div>
-                ) : (
-                  <ProgramCreation
-                    programs={programs}
-                    takes={takes}
-                    onProgramCreate={handleCreateProgram}
-                    onProgramUpdate={handleUpdateProgram}
-                    selectedProgramId={selectedProgramId}
-                    onTakeCreate={createTake}
-                    onTakeUpdate={updateTake}
-                    onTakeDelete={deleteTake}
-                    onProgramSave={saveProgram}
-                  />
-                )}
-              </div>
-            </SidebarInset>
-          </div>
-        </SidebarProvider>
-      </div>
-      <Footer />
-    </div>
+    <DashboardLayout>
+      <DashboardContent 
+        programs={programs}
+        takes={takes}
+        takesLoading={takesLoading}
+        selectedProgramId={selectedProgramId}
+        onProgramClick={handleProgramClick}
+        onProgramDelete={deleteProgram}
+        onPublishDateChange={updateProgramPublishDate}
+        onExportPdf={handleExportToPdf}
+        onCreateTake={handleCreateTake}
+        onProgramCreate={handleCreateProgram}
+        onProgramUpdate={handleUpdateProgram}
+        onTakeCreate={createTake}
+        onTakeUpdate={updateTake}
+        onTakeDelete={deleteTake}
+        onProgramSave={saveProgram}
+      />
+    </DashboardLayout>
   );
 }
 
