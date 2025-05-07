@@ -13,7 +13,7 @@ export function useSidebarState() {
   let sidebarState = { 
     open: true, 
     setOpen: (value: boolean) => {}, 
-    state: "expanded" as const 
+    state: "expanded" as "expanded" | "collapsed" 
   };
   
   try {
