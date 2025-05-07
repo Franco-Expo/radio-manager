@@ -30,7 +30,6 @@ export function useSidebarState() {
     console.log("Using default sidebar state");
   }
   
-  // Is the sidebar collapsed (not open)
   const isCollapsed = sidebarState.state === "collapsed";
   
   const setIsCollapsed = (collapsed: boolean) => {

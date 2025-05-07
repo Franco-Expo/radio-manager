@@ -14,20 +14,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
       <Header />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <SidebarProvider defaultOpen={!isMobile}>
-          <AppSidebar 
-            programs={[]} 
-            onProgramClick={() => {}} 
-            onProgramDelete={() => {}} 
-            onPublishDateChange={() => {}} 
-            onExportPdf={() => {}}
-          />
-          <main className="flex-1 flex flex-col overflow-y-auto">
-            {children}
-          </main>
+          {children}
         </SidebarProvider>
       </div>
       <Footer />
