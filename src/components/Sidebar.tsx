@@ -75,7 +75,7 @@ export function Sidebar({
   };
 
   // Take only the first 2 items for initial display - reduced from 4 to 2
-  const visiblePublishedPrograms = filteredPublishedPrograms.slice(0, 0);
+  const visiblePublishedPrograms = filteredPublishedPrograms.slice(0, 1);
   const hasMorePublishedPrograms = filteredPublishedPrograms.length > 2;
 
   return (
