@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgramItem } from "./ProgramItem";
-import { ChevronLeft, ChevronRight, Menu, Radio } from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, Radio, Search } from "lucide-react";
 import { APP_NAME } from "@/lib/constants";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Input } from "./ui/input";
 
 type Program = {
   id: string;
@@ -31,6 +32,8 @@ export function Sidebar({
   onCreateTake 
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [programSearchQuery, setProgramSearchQuery] = useState("");
+  const [publishedSearchQuery, setPublishedSearchQuery] = useState("");
   const isMobile = useIsMobile();
   
   // Auto-collapse on mobile
@@ -44,9 +47,9 @@ export function Sidebar({
     setIsCollapsed(!isCollapsed);
   };
   
-  // Sort published programs by publication date in descending order (newest first)
-  const publishedPrograms = programs
-    .filter(p => p.publishDate)
+  // Filter published programs by search query and sort them
+  const filteredPublishedPrograms = programs
+    .filter(p => p.publishDate && p.name.toLowerCase().includes(publishedSearchQuery.toLowerCase()))
     .sort((a, b) => {
       if (a.publishDate && b.publishDate) {
         return b.publishDate.getTime() - a.publishDate.getTime();
@@ -54,14 +57,16 @@ export function Sidebar({
       return 0;
     });
   
-  // Ordina i programmi per nome in ordine decrescente alfabetico (dalla Z alla A)
-  const sortedPrograms = [...programs].sort((a, b) => b.name.localeCompare(a.name));
+  // Filter and sort programs by name, applying search filter
+  const filteredPrograms = programs
+    .filter(p => p.name.toLowerCase().includes(programSearchQuery.toLowerCase()))
+    .sort((a, b) => b.name.localeCompare(a.name));
   
   // Improved handler with better logging and making sure a valid program ID is available
   const handleProgramsHeaderClick = () => {
     console.log("Programmi Radio header clicked");
-    if (sortedPrograms.length > 0) {
-      const programToSelect = sortedPrograms[0];
+    if (filteredPrograms.length > 0) {
+      const programToSelect = filteredPrograms[0];
       console.log(`Selecting program: ${programToSelect.name} with ID: ${programToSelect.id}`);
       onProgramClick(programToSelect.id);
     } else {
@@ -104,12 +109,42 @@ export function Sidebar({
         )}
       </div>
       
-      {!isCollapsed && publishedPrograms.length > 0 && (
+      {/* New search inputs for both sections */}
+      {!isCollapsed && (
+        <div className="p-2 border-b space-y-2">
+          <div className="flex items-center">
+            <Search className="h-4 w-4 text-muted-foreground mr-2" />
+            <Input 
+              placeholder="Cerca programmi..." 
+              className="h-8 text-xs" 
+              value={programSearchQuery}
+              onChange={(e) => setProgramSearchQuery(e.target.value)}
+              aria-label="Cerca Programmazione Radio"
+            />
+          </div>
+        </div>
+      )}
+      
+      {!isCollapsed && filteredPublishedPrograms.length > 0 && (
         <div className="p-4 border-b flex flex-col">
-          <h3 className="text-sm font-medium mb-2">Pubblicazione</h3>
+          <div className="flex items-center mb-2">
+            <h3 className="text-sm font-medium flex-1">Pubblicazione</h3>
+            {!isCollapsed && (
+              <div className="flex items-center">
+                <Search className="h-4 w-4 text-muted-foreground mr-1" />
+                <Input 
+                  placeholder="Cerca..." 
+                  className="h-7 text-xs w-28" 
+                  value={publishedSearchQuery}
+                  onChange={(e) => setPublishedSearchQuery(e.target.value)}
+                  aria-label="Cerca Pubblicazione"
+                />
+              </div>
+            )}
+          </div>
           <ScrollArea className="h-auto max-h-[25vh] pr-2">
             <div className="space-y-1 pr-2">
-              {publishedPrograms.map((program) => (
+              {filteredPublishedPrograms.map((program) => (
                 <div 
                   key={`pub-${program.id}`}
                   className="text-xs flex justify-between cursor-pointer hover:bg-accent p-1 rounded-md"
@@ -141,7 +176,7 @@ export function Sidebar({
           </h3>
           <ScrollArea className="flex-1 pr-2">
             <div className="space-y-1 pr-2">
-              {sortedPrograms.map((program) => (
+              {filteredPrograms.map((program) => (
                 <ProgramItem 
                   key={program.id}
                   program={program}
