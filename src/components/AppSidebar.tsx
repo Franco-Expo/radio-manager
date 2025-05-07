@@ -46,12 +46,12 @@ export function AppSidebar({
 
   return (
     <>
-      {/* Pulsante per mostrare sidebar quando è nascosta */}
+      {/* Button to show sidebar when collapsed */}
       {isCollapsed && (
         <Button
           variant="outline"
           size="icon"
-          className="fixed top-20 left-2 z-20 rounded-full h-10 w-10 shadow-md md:flex hidden transition-opacity ease-in-out duration-300"
+          className="fixed top-20 left-2 z-20 rounded-full h-10 w-10 shadow-md md:flex hidden transition-opacity ease-in-out duration-300 opacity-100"
           onClick={toggleSidebar}
           title="Mostra sidebar"
         >
@@ -64,7 +64,7 @@ export function AppSidebar({
         collapsible="icon" 
         variant="sidebar"
         side="left"
-        className="h-[calc(100vh-4rem)]" // Adjust height to leave room for footer
+        className="h-[calc(100vh-8rem)]" // Adjust height to leave room for header and footer
       >
         <SidebarHeader>
           <div className="flex items-center justify-between p-2">
