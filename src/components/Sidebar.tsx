@@ -109,39 +109,24 @@ export function Sidebar({
         )}
       </div>
       
-      {/* New search inputs for both sections */}
-      {!isCollapsed && (
-        <div className="p-2 border-b space-y-2">
-          <div className="flex items-center">
-            <Search className="h-4 w-4 text-muted-foreground mr-2" />
-            <Input 
-              placeholder="Cerca programmi..." 
-              className="h-8 text-xs" 
-              value={programSearchQuery}
-              onChange={(e) => setProgramSearchQuery(e.target.value)}
-              aria-label="Cerca Programmazione Radio"
-            />
-          </div>
-        </div>
-      )}
-      
       {!isCollapsed && filteredPublishedPrograms.length > 0 && (
         <div className="p-4 border-b flex flex-col">
           <div className="flex items-center mb-2">
             <h3 className="text-sm font-medium flex-1">Pubblicazione</h3>
-            {!isCollapsed && (
-              <div className="flex items-center">
-                <Search className="h-4 w-4 text-muted-foreground mr-1" />
-                <Input 
-                  placeholder="Cerca..." 
-                  className="h-7 text-xs w-28" 
-                  value={publishedSearchQuery}
-                  onChange={(e) => setPublishedSearchQuery(e.target.value)}
-                  aria-label="Cerca Pubblicazione"
-                />
-              </div>
-            )}
           </div>
+          
+          {/* Moved search field under the "Pubblicazione" title */}
+          <div className="flex items-center mb-3">
+            <Search className="h-4 w-4 text-muted-foreground mr-1" />
+            <Input 
+              placeholder="Cerca..." 
+              className="h-7 text-xs" 
+              value={publishedSearchQuery}
+              onChange={(e) => setPublishedSearchQuery(e.target.value)}
+              aria-label="Cerca Pubblicazione"
+            />
+          </div>
+          
           <ScrollArea className="h-auto max-h-[25vh] pr-2">
             <div className="space-y-1 pr-2">
               {filteredPublishedPrograms.map((program) => (
@@ -174,6 +159,19 @@ export function Sidebar({
             <Radio className="h-4 w-4" />
             <span>Programmi Radio</span>
           </h3>
+          
+          {/* Moved search field under the "Programmi Radio" title */}
+          <div className="flex items-center mb-3">
+            <Search className="h-4 w-4 text-muted-foreground mr-1" />
+            <Input 
+              placeholder="Cerca programmi..." 
+              className="h-7 text-xs" 
+              value={programSearchQuery}
+              onChange={(e) => setProgramSearchQuery(e.target.value)}
+              aria-label="Cerca Programmazione Radio"
+            />
+          </div>
+          
           <ScrollArea className="flex-1 pr-2">
             <div className="space-y-1 pr-2">
               {filteredPrograms.map((program) => (
