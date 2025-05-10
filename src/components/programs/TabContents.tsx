@@ -7,7 +7,7 @@ type TabContentsProps = {
   takes: Take[];
   activeTake: string | undefined;
   onDeleteTake: (takeId: string) => void;
-  onSaveTake: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => Promise<boolean>;
+  onSaveTake: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date) => Promise<boolean>;
   onSaveComplete: () => void;
 };
 
@@ -27,9 +27,8 @@ export function TabContents({
             takeNumber={take.number}
             initialSongs={take.songs}
             initialDate={take.date}
-            initialPublishDate={take.publishDate}
             onDelete={() => onDeleteTake(take.id)}
-            onSave={(songs, date, publishDate) => onSaveTake(take.id, songs, date, publishDate)}
+            onSave={(songs, date) => onSaveTake(take.id, songs, date)}
             onSaveComplete={onSaveComplete}
           />
         </TabsContent>

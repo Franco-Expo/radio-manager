@@ -11,6 +11,5 @@ export interface Take {
   id: string;
   number: number;
   date: Date;
-  publishDate?: Date | null;
   songs: Song[];
 }

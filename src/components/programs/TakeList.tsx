@@ -11,7 +11,7 @@ type TakeListProps = {
   selectedProgram: Program;
   takes: Take[];
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
-  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => Promise<boolean>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date) => Promise<boolean>;
   onTakeDelete: (takeId: string) => Promise<void>;
   onSaveProgram: (programId: string) => Promise<void>;
   onSaveComplete: () => void;
@@ -48,8 +48,8 @@ export function TakeList({
     }
   };
   
-  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => {
-    return await onTakeUpdate(takeId, songs, date, publishDate);
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date) => {
+    return await onTakeUpdate(takeId, songs, date);
   };
   
   const handleSaveProgram = async () => {
@@ -94,9 +94,8 @@ export function TakeList({
               takeNumber={take.number}
               initialSongs={take.songs}
               initialDate={take.date}
-              initialPublishDate={take.publishDate}
               onDelete={() => handleDeleteTake(take.id)}
-              onSave={(songs, date, publishDate) => handleSaveTake(take.id, songs, date, publishDate)}
+              onSave={(songs, date) => handleSaveTake(take.id, songs, date)}
               onSaveComplete={onSaveComplete}
             />
           </TabsContent>

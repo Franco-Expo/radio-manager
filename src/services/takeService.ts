@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Song, Take } from '@/types/takes';
 
@@ -32,7 +33,6 @@ export async function fetchTakes(programId: string): Promise<Take[]> {
       id: take.id,
       number: take.number,
       date: take.date ? new Date(take.date) : new Date(),
-      publishDate: take.publish_date ? new Date(take.publish_date) : null,
       songs: songsData.map(song => ({
         id: song.id,
         title: song.title,
@@ -59,7 +59,6 @@ export async function createTake(programId: string, number: number): Promise<Tak
       program_id: programId,
       number: number,
       date: new Date().toISOString(),
-      publish_date: null
     })
     .select()
     .single();
@@ -85,7 +84,6 @@ export async function createTake(programId: string, number: number): Promise<Tak
     id: takeData.id,
     number: takeData.number,
     date: takeData.date ? new Date(takeData.date) : new Date(),
-    publishDate: takeData.publish_date ? new Date(takeData.publish_date) : null,
     songs: [{
       id: songData.id,
       title: songData.title,
@@ -101,13 +99,12 @@ export async function createTake(programId: string, number: number): Promise<Tak
 /**
  * Updates all songs for a take (deletes existing songs and creates new ones)
  */
-export async function updateTake(takeId: string, songs: Song[], date: Date, publishDate: Date | null): Promise<boolean> {
-  // Update the take date and publishDate
+export async function updateTake(takeId: string, songs: Song[], date: Date): Promise<boolean> {
+  // Update the take date
   const { error: updateTakeError } = await supabase
     .from('takes')
     .update({ 
       date: date.toISOString(),
-      publish_date: publishDate ? publishDate.toISOString() : null,
       updated_at: new Date().toISOString()
     })
     .eq('id', takeId);
