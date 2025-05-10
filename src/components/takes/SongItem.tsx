@@ -3,19 +3,38 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrashIcon, Eraser } from "lucide-react";
+import { TrashIcon, Eraser, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { it } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 type SongItemProps = {
   id: string;
   title: string;
   news: string;
-  artist?: string; // Added artist as optional prop
+  artist?: string;
+  productionDate?: Date | null;
   onDelete: (id: string) => void;
-  onChange: (id: string, field: "title" | "news" | "artist", value: string) => void;
+  onChange: (id: string, field: "title" | "news" | "artist" | "productionDate", value: string | Date | null) => void;
   onClearContent?: (id: string) => void;
 };
 
-export function SongItem({ id, title, news, artist = "", onDelete, onChange, onClearContent }: SongItemProps) {
+export function SongItem({ 
+  id, 
+  title, 
+  news, 
+  artist = "", 
+  productionDate = null, 
+  onDelete, 
+  onChange, 
+  onClearContent 
+}: SongItemProps) {
   const handleClearContent = () => {
     if (onClearContent) {
       onClearContent(id);
@@ -24,6 +43,7 @@ export function SongItem({ id, title, news, artist = "", onDelete, onChange, onC
       onChange(id, "title", "");
       onChange(id, "news", "");
       onChange(id, "artist", "");
+      onChange(id, "productionDate", null);
     }
   };
 
@@ -37,6 +57,35 @@ export function SongItem({ id, title, news, artist = "", onDelete, onChange, onC
           onChange={(e) => onChange(id, "title", e.target.value)}
           placeholder="Inserisci l'artista e il titolo della canzone"
         />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor={`production-date-${id}`}>Data di Produzione</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id={`production-date-${id}`}
+              variant={"outline"}
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !productionDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {productionDate ? format(productionDate, "PPP", { locale: it }) : <span>Seleziona data di produzione</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={productionDate || undefined}
+              onSelect={(date) => onChange(id, "productionDate", date)}
+              locale={it}
+              initialFocus
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
       
       <div className="space-y-2">

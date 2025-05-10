@@ -4,6 +4,7 @@ export interface Song {
   title: string;
   artist?: string;
   news: string;
+  productionDate?: Date | null;
 }
 
 export interface Take {

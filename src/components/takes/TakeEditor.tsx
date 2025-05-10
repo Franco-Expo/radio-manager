@@ -12,7 +12,8 @@ type SongInfo = {
   id: string;
   title: string;
   news: string;
-  artist?: string; // Added artist field
+  artist?: string;
+  productionDate?: Date | null;
 };
 
 type TakeEditorProps = {
@@ -20,10 +21,10 @@ type TakeEditorProps = {
   takeNumber: number;
   initialSongs: SongInfo[];
   initialDate?: Date;
-  initialPublishDate?: Date | null; // Added initialPublishDate
+  initialPublishDate?: Date | null;
   onDelete: () => void;
-  onSave: (songs: SongInfo[], date: Date, publishDate: Date | null) => Promise<boolean>; // Updated onSave function
-  onSaveComplete?: () => void; // Made optional, won't be called after successful save
+  onSave: (songs: SongInfo[], date: Date, publishDate: Date | null) => Promise<boolean>;
+  onSaveComplete?: () => void;
 };
 
 export function TakeEditor({ 
@@ -61,7 +62,7 @@ export function TakeEditor({
     setSongs([...songs, { id: `song-${Date.now()}`, title: "", news: "" }]);
   };
   
-  const handleSongChange = (id: string, field: keyof SongInfo, value: string) => {
+  const handleSongChange = (id: string, field: "title" | "news" | "artist" | "productionDate", value: string | Date | null) => {
     setSongs(
       songs.map((song) => (song.id === id ? { ...song, [field]: value } : song))
     );
@@ -81,7 +82,7 @@ export function TakeEditor({
   
   const handleClearSongContent = (id: string) => {
     setSongs(
-      songs.map((song) => (song.id === id ? { ...song, title: "", news: "" } : song))
+      songs.map((song) => (song.id === id ? { ...song, title: "", news: "", artist: "", productionDate: null } : song))
     );
     sonnerToast.success("Contenuto cancellato");
   };

@@ -57,9 +57,9 @@ export function useTakes(programId: string | undefined) {
     }
   };
 
-  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => {
+  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => {
     try {
-      // Pass date and publishDate to the service
+      // Pass date, publishDate and productionDate to the service
       const success = await updateTakeService(takeId, songs, date, publishDate);
       if (success) {
         // Update local state

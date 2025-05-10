@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsList } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +11,7 @@ type TakeManagerProps = {
   takes: Take[];
   selectedProgram: Program;
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
-  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => Promise<boolean>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => Promise<boolean>;
   onTakeDelete: (takeId: string) => Promise<void>;
   onSaveProgram: (programId: string) => Promise<void>;
   onSaveComplete: () => void;
@@ -64,7 +63,7 @@ export function TakeManager({
     }
   };
 
-  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => {
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => {
     return await onTakeUpdate(takeId, songs, date, publishDate);
   };
 

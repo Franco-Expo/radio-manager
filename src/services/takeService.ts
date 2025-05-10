@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Song, Take } from '@/types/takes';
 
@@ -39,6 +38,7 @@ export async function fetchTakes(programId: string): Promise<Take[]> {
         title: song.title,
         artist: song.artist || undefined,
         news: song.news || '',
+        productionDate: song.production_date ? new Date(song.production_date) : null,
       })),
     });
   }
@@ -74,6 +74,7 @@ export async function createTake(programId: string, number: number): Promise<Tak
       title: '',
       artist: '',
       news: '',
+      production_date: null,
     })
     .select()
     .single();
@@ -90,6 +91,7 @@ export async function createTake(programId: string, number: number): Promise<Tak
       title: songData.title,
       artist: songData.artist || undefined,
       news: songData.news || '',
+      productionDate: null,
     }],
   };
 
@@ -126,6 +128,7 @@ export async function updateTake(takeId: string, songs: Song[], date: Date, publ
     title: song.title,
     artist: song.artist || null,
     news: song.news,
+    production_date: song.productionDate ? song.productionDate.toISOString() : null,
   }));
 
   const { error: insertError } = await supabase

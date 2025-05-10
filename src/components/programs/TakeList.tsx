@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,7 +11,7 @@ type TakeListProps = {
   selectedProgram: Program;
   takes: Take[];
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
-  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => Promise<boolean>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => Promise<boolean>;
   onTakeDelete: (takeId: string) => Promise<void>;
   onSaveProgram: (programId: string) => Promise<void>;
   onSaveComplete: () => void;
@@ -47,7 +48,7 @@ export function TakeList({
     }
   };
   
-  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => {
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => {
     return await onTakeUpdate(takeId, songs, date, publishDate);
   };
   

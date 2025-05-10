@@ -7,7 +7,7 @@ type TabContentsProps = {
   takes: Take[];
   activeTake: string | undefined;
   onDeleteTake: (takeId: string) => void;
-  onSaveTake: (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => Promise<boolean>; // Updated signature to include publishDate
+  onSaveTake: (takeId: string, songs: { id: string; title: string; news: string; artist?: string; productionDate?: Date | null }[], date: Date, publishDate: Date | null) => Promise<boolean>;
   onSaveComplete: () => void;
 };
 
