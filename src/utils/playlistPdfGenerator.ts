@@ -74,10 +74,10 @@ export function generatePlaylistPdf(program: Program, takes: Take[]) {
           doc.setFontSize(FONT_SIZES.normal);
           doc.setFont("helvetica", "normal");
           
-          // Format: Number. Title - Artist
+          // Format: Number. Artist - Title
+          const artistText = song.artist ? `${song.artist} - ` : "";
           const titleText = song.title || "Titolo non specificato";
-          const artistText = song.artist ? ` - ${song.artist}` : "";
-          const songText = `${i + 1}. ${titleText}${artistText}`;
+          const songText = `${i + 1}. ${artistText}${titleText}`;
           
           doc.text(songText, DOCUMENT_MARGINS.left + 10, y);
           y += 5; // Small space between songs

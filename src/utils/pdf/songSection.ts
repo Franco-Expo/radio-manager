@@ -29,10 +29,10 @@ export function renderSongs(doc: jsPDF, songs: Song[], startY: number): number {
     doc.setFontSize(FONT_SIZES.normal);
     doc.setFont("helvetica", "bold");
     
-    // Format: Number. Title - Artist
+    // Format: Number. Artist - Title
+    const artistText = song.artist ? `${song.artist} - ` : "";
     const titleText = song.title || "Titolo non specificato";
-    const artistText = song.artist ? ` - ${song.artist}` : "";
-    const songHeaderText = `${i + 1}. ${titleText}${artistText}`;
+    const songHeaderText = `${i + 1}. ${artistText}${titleText}`;
     const songHeaderHeight = 4; // Reduced from 5
     
     // Check for page break before drawing the song title

@@ -57,14 +57,14 @@ export function useTakes(programId: string | undefined) {
     }
   };
 
-  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => {
+  const updateTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => {
     try {
-      // Passiamo la data al servizio di aggiornamento take
-      const success = await updateTakeService(takeId, songs, date);
+      // Pass date and publishDate to the service
+      const success = await updateTakeService(takeId, songs, date, publishDate);
       if (success) {
-        // Aggiorniamo lo stato locale
+        // Update local state
         setTakes(takes.map(take => 
-          take.id === takeId ? { ...take, songs, date } : take
+          take.id === takeId ? { ...take, songs, date, publishDate } : take
         ));
         sonnerToast.success('Take salvata con successo');
       }

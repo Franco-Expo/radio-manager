@@ -12,7 +12,7 @@ type TakeManagerProps = {
   takes: Take[];
   selectedProgram: Program;
   onTakeCreate: (takeNumber: number) => Promise<Take | null>;
-  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => Promise<boolean>;
+  onTakeUpdate: (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => Promise<boolean>;
   onTakeDelete: (takeId: string) => Promise<void>;
   onSaveProgram: (programId: string) => Promise<void>;
   onSaveComplete: () => void;
@@ -64,8 +64,8 @@ export function TakeManager({
     }
   };
 
-  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string }[], date: Date) => {
-    return await onTakeUpdate(takeId, songs, date);
+  const handleSaveTake = async (takeId: string, songs: { id: string; title: string; news: string; artist?: string }[], date: Date, publishDate: Date | null) => {
+    return await onTakeUpdate(takeId, songs, date, publishDate);
   };
 
   const handleSaveProgram = async () => {

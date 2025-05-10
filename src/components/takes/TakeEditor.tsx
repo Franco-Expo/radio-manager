@@ -12,6 +12,7 @@ type SongInfo = {
   id: string;
   title: string;
   news: string;
+  artist?: string; // Added artist field
 };
 
 type TakeEditorProps = {
@@ -19,8 +20,9 @@ type TakeEditorProps = {
   takeNumber: number;
   initialSongs: SongInfo[];
   initialDate?: Date;
+  initialPublishDate?: Date | null; // Added initialPublishDate
   onDelete: () => void;
-  onSave: (songs: SongInfo[], date: Date) => Promise<boolean>;
+  onSave: (songs: SongInfo[], date: Date, publishDate: Date | null) => Promise<boolean>; // Updated onSave function
   onSaveComplete?: () => void; // Made optional, won't be called after successful save
 };
 
@@ -29,6 +31,7 @@ export function TakeEditor({
   takeNumber, 
   initialSongs,
   initialDate,
+  initialPublishDate,
   onDelete, 
   onSave, 
   onSaveComplete 
@@ -39,6 +42,7 @@ export function TakeEditor({
       : [{ id: `song-${Date.now()}`, title: "", news: "" }]
   );
   const [date, setDate] = useState<Date>(initialDate || new Date());
+  const [publishDate, setPublishDate] = useState<Date | null>(initialPublishDate || null);
   const { toast } = useToast();
   
   // Update date when initialDate changes
@@ -47,6 +51,11 @@ export function TakeEditor({
       setDate(initialDate);
     }
   }, [initialDate]);
+
+  // Update publishDate when initialPublishDate changes
+  useEffect(() => {
+    setPublishDate(initialPublishDate || null);
+  }, [initialPublishDate]);
   
   const handleAddSong = () => {
     setSongs([...songs, { id: `song-${Date.now()}`, title: "", news: "" }]);
@@ -78,7 +87,7 @@ export function TakeEditor({
   };
   
   const handleSave = async () => {
-    const result = await onSave(songs, date);
+    const result = await onSave(songs, date, publishDate);
     
     if (result) {
       sonnerToast.success("Salvataggio completato", {
@@ -98,7 +107,9 @@ export function TakeEditor({
         <TakeHeader 
           takeNumber={takeNumber} 
           date={date} 
-          onDateChange={setDate} 
+          onDateChange={setDate}
+          publishDate={publishDate}
+          onPublishDateChange={setPublishDate}
         />
       </CardHeader>
       

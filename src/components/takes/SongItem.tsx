@@ -9,12 +9,13 @@ type SongItemProps = {
   id: string;
   title: string;
   news: string;
+  artist?: string; // Added artist as optional prop
   onDelete: (id: string) => void;
-  onChange: (id: string, field: "title" | "news", value: string) => void;
+  onChange: (id: string, field: "title" | "news" | "artist", value: string) => void;
   onClearContent?: (id: string) => void;
 };
 
-export function SongItem({ id, title, news, onDelete, onChange, onClearContent }: SongItemProps) {
+export function SongItem({ id, title, news, artist = "", onDelete, onChange, onClearContent }: SongItemProps) {
   const handleClearContent = () => {
     if (onClearContent) {
       onClearContent(id);
@@ -22,18 +23,19 @@ export function SongItem({ id, title, news, onDelete, onChange, onClearContent }
       // Fallback if onClearContent is not provided
       onChange(id, "title", "");
       onChange(id, "news", "");
+      onChange(id, "artist", "");
     }
   };
 
   return (
     <div className="space-y-4 p-4 border rounded-md relative">
       <div className="space-y-2">
-        <Label htmlFor={`title-${id}`}>Titolo Canzone - Artista</Label>
+        <Label htmlFor={`title-${id}`}>Artista - Titolo Canzone</Label>
         <Input
           id={`title-${id}`}
           value={title}
           onChange={(e) => onChange(id, "title", e.target.value)}
-          placeholder="Inserisci il titolo della canzone e l'artista"
+          placeholder="Inserisci l'artista e il titolo della canzone"
         />
       </div>
       
