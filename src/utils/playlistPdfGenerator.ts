@@ -4,6 +4,8 @@ import { Take } from '@/types/takes';
 import { Program } from './pdf/types';
 import { setupDocumentProperties, addFooter, FONT_SIZES, DOCUMENT_MARGINS, checkForPageBreak } from './pdf/documentStyles';
 import { addProgramHeader } from './pdf/headerSection';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
 
 export function generatePlaylistPdf(program: Program, takes: Take[]) {
   // Create a new PDF document - A4 format
@@ -80,7 +82,25 @@ export function generatePlaylistPdf(program: Program, takes: Take[]) {
           const songText = `${i + 1}. ${artistText}${titleText}`;
           
           doc.text(songText, DOCUMENT_MARGINS.left + 10, y);
-          y += 5; // Small space between songs
+          y += 5;
+          
+          // Add production date if available
+          if (song.productionDate) {
+            doc.setFontSize(FONT_SIZES.small);
+            doc.setFont("helvetica", "italic");
+            doc.setTextColor(80);
+            
+            try {
+              const formattedDate = format(new Date(song.productionDate), 'dd/MM/yyyy', { locale: it });
+              doc.text(`Data di Produzione: ${formattedDate}`, DOCUMENT_MARGINS.left + 15, y);
+            } catch (error) {
+              console.error("Error formatting production date:", error);
+              doc.text("Data di Produzione: Data non valida", DOCUMENT_MARGINS.left + 15, y);
+            }
+            
+            y += 5;
+            doc.setTextColor(0);
+          }
         }
       }
       

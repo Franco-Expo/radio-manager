@@ -1,18 +1,8 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrashIcon, Eraser, CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { it } from "date-fns/locale";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { TrashIcon, Eraser } from "lucide-react";
 
 type SongItemProps = {
   id: string;
@@ -47,6 +37,26 @@ export function SongItem({
     }
   };
 
+  // Format date for display in input field
+  const formatDateForInput = (date: Date | null) => {
+    if (!date) return "";
+    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  };
+
+  // Handle date input change
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // If empty, set to null
+    if (!value) {
+      onChange(id, "productionDate", null);
+      return;
+    }
+    
+    // Otherwise create a new date from the input value
+    const newDate = new Date(value);
+    onChange(id, "productionDate", newDate);
+  };
+
   return (
     <div className="space-y-4 p-4 border rounded-md relative">
       <div className="space-y-2">
@@ -61,31 +71,14 @@ export function SongItem({
       
       <div className="space-y-2">
         <Label htmlFor={`production-date-${id}`}>Data di Produzione</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id={`production-date-${id}`}
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !productionDate && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {productionDate ? format(productionDate, "PPP", { locale: it }) : <span>Seleziona data di produzione</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={productionDate || undefined}
-              onSelect={(date) => onChange(id, "productionDate", date)}
-              locale={it}
-              initialFocus
-              className="pointer-events-auto"
-            />
-          </PopoverContent>
-        </Popover>
+        <Input
+          id={`production-date-${id}`}
+          type="date"
+          value={formatDateForInput(productionDate)}
+          onChange={handleDateChange}
+          placeholder="Data di produzione"
+          className="w-full"
+        />
       </div>
       
       <div className="space-y-2">
