@@ -6,11 +6,12 @@ type SongInfo = {
   id: string;
   title: string;
   news: string;
+  artist?: string;
 };
 
 type SongListProps = {
   songs: SongInfo[];
-  onSongChange: (id: string, field: "title" | "news", value: string) => void;
+  onSongChange: (id: string, field: "title" | "news" | "artist", value: string) => void;
   onDeleteSong: (id: string) => void;
   onAddSong: () => void;
   onClearSongContent?: (id: string) => void;
@@ -31,6 +32,7 @@ export function SongList({
           id={song.id}
           title={song.title}
           news={song.news}
+          artist={song.artist}
           onDelete={onDeleteSong}
           onChange={onSongChange}
           onClearContent={onClearSongContent}

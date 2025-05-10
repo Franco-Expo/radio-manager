@@ -38,6 +38,7 @@ export type Database = {
       }
       songs: {
         Row: {
+          artist: string | null
           created_at: string
           id: string
           news: string | null
@@ -46,6 +47,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          artist?: string | null
           created_at?: string
           id?: string
           news?: string | null
@@ -54,6 +56,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          artist?: string | null
           created_at?: string
           id?: string
           news?: string | null
@@ -78,6 +81,7 @@ export type Database = {
           id: string
           number: number
           program_id: string
+          publish_date: string | null
           updated_at: string
         }
         Insert: {
@@ -86,6 +90,7 @@ export type Database = {
           id?: string
           number: number
           program_id: string
+          publish_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -94,6 +99,7 @@ export type Database = {
           id?: string
           number?: number
           program_id?: string
+          publish_date?: string | null
           updated_at?: string
         }
         Relationships: [
