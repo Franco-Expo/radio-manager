@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { CalendarIcon, FileText, FilePlus, Trash2, X } from "lucide-react";
+import { CalendarIcon, FileText, FilePlus, Trash2, X, Music } from "lucide-react";
 import { toast as sonnerToast } from "sonner";
 
 type Program = {
@@ -62,6 +62,17 @@ export function ProgramItem({
       onCreateTake(program.id);
     }
   };
+
+  const handleExportProgramPdf = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onExportPdf(program.id);
+  };
+
+  const handleExportPlaylistPdf = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // We'll reuse the same handler but pass a special flag to indicate this is a playlist export
+    onExportPdf(`${program.id}?playlist=true`);
+  };
   
   return (
     <ContextMenu>
@@ -103,14 +114,18 @@ export function ProgramItem({
           Crea nuova Take
         </ContextMenuItem>
         <ContextMenuItem 
-          onClick={(e) => {
-            e.stopPropagation();
-            onExportPdf(program.id);
-          }}
+          onClick={handleExportProgramPdf}
           className="flex items-center gap-2"
         >
           <FileText className="h-4 w-4" />
-          Salva come PDF
+          Salva programma come PDF
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={handleExportPlaylistPdf}
+          className="flex items-center gap-2"
+        >
+          <Music className="h-4 w-4" />
+          Salva playlist come PDF
         </ContextMenuItem>
         {program.publishDate && (
           <ContextMenuItem 

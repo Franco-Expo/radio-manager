@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { generateProgramPdf } from "@/utils/pdfGenerator";
+import { generatePlaylistPdf } from "@/utils/playlistPdfGenerator";
 import { usePrograms } from "@/hooks/usePrograms";
 import type { Program } from '@/types/programs';
 import { useTakes } from "@/hooks/useTakes";
@@ -110,7 +111,11 @@ const Dashboard = () => {
     }
   };
   
-  const handleExportToPdf = (programId: string) => {
+  const handleExportToPdf = (programIdWithParams: string) => {
+    // Check if this is a playlist export
+    const isPlaylist = programIdWithParams.includes('?playlist=true');
+    const programId = isPlaylist ? programIdWithParams.split('?')[0] : programIdWithParams;
+    
     const program = programs.find(p => p.id === programId);
     if (!program) {
       toast({
@@ -126,11 +131,19 @@ const Dashboard = () => {
       setSelectedProgramId(programId);
       setTimeout(() => {
         try {
-          generateProgramPdf(program, takes);
-          toast({
-            title: "PDF generato",
-            description: `Il programma "${program.name}" è stato salvato come PDF`,
-          });
+          if (isPlaylist) {
+            generatePlaylistPdf(program, takes);
+            toast({
+              title: "PDF della playlist generato",
+              description: `La playlist "${program.name}" è stata salvata come PDF`,
+            });
+          } else {
+            generateProgramPdf(program, takes);
+            toast({
+              title: "PDF del programma generato",
+              description: `Il programma "${program.name}" è stato salvato come PDF`,
+            });
+          }
         } catch (error) {
           toast({
             title: "Errore",
@@ -142,11 +155,19 @@ const Dashboard = () => {
       }, 1000); // Give time for the takes to load
     } else {
       try {
-        generateProgramPdf(program, takes);
-        toast({
-          title: "PDF generato",
-          description: `Il programma "${program.name}" è stato salvato come PDF`,
-        });
+        if (isPlaylist) {
+          generatePlaylistPdf(program, takes);
+          toast({
+            title: "PDF della playlist generato",
+            description: `La playlist "${program.name}" è stata salvata come PDF`,
+          });
+        } else {
+          generateProgramPdf(program, takes);
+          toast({
+            title: "PDF del programma generato",
+            description: `Il programma "${program.name}" è stato salvato come PDF`,
+          });
+        }
       } catch (error) {
         toast({
           title: "Errore",
