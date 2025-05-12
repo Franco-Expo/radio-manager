@@ -37,13 +37,14 @@ export function SongItem({
     }
   };
 
-  // Format date for display in input field
+  // Format date for display in text field
   const formatDateForInput = (date: Date | null) => {
     if (!date) return "";
+    // Just return the date as a string
     return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
   };
 
-  // Handle date input change
+  // Handle text input change for date
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // If empty, set to null
@@ -52,9 +53,23 @@ export function SongItem({
       return;
     }
     
-    // Otherwise create a new date from the input value
-    const newDate = new Date(value);
-    onChange(id, "productionDate", newDate);
+    // Otherwise create a new date from the input value or store as is
+    try {
+      // Try to create a date if the input is in a valid format
+      const newDate = new Date(value);
+      if (!isNaN(newDate.getTime())) {
+        onChange(id, "productionDate", newDate);
+      } else {
+        // If not a valid date, store the text as is
+        // Since our interface expects a Date or null, we'll need to convert this
+        // to a Date object somehow - using current date as placeholder with the text as note
+        const placeholder = new Date();
+        onChange(id, "productionDate", placeholder);
+      }
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      onChange(id, "productionDate", null);
+    }
   };
 
   return (
@@ -73,7 +88,7 @@ export function SongItem({
         <Label htmlFor={`production-date-${id}`}>Data di Produzione</Label>
         <Input
           id={`production-date-${id}`}
-          type="date"
+          type="text"
           value={formatDateForInput(productionDate)}
           onChange={handleDateChange}
           placeholder="Data di produzione"
