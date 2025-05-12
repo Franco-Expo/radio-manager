@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsList } from "@/components/ui/tabs";
-import { useToast } from "@/hooks/use-toast";
+import { showError, showSuccess } from "@/lib/toast";
 import type { Take } from "@/types/takes";
 import type { Program } from "@/types/programs";
 import { ActionButtons } from "./ActionButtons";
@@ -28,7 +28,6 @@ export function TakeManager({
   onSaveComplete
 }: TakeManagerProps) {
   const [activeTake, setActiveTake] = useState<string | undefined>(undefined);
-  const { toast } = useToast();
 
   // Set active take to first take if none selected and takes exist
   useEffect(() => {
@@ -48,11 +47,7 @@ export function TakeManager({
 
   const handleDeleteTake = async (takeId: string) => {
     if (takes.length <= 1) {
-      toast({
-        title: "Impossibile eliminare",
-        description: "È necessario almeno una take nel programma",
-        variant: "destructive",
-      });
+      showError("Impossibile eliminare", "È necessario almeno una take nel programma");
       return;
     }
     
@@ -71,10 +66,7 @@ export function TakeManager({
   const handleSaveProgram = async () => {
     if (selectedProgram) {
       await onSaveProgram(selectedProgram.id);
-      toast({
-        title: "Programma salvato",
-        description: "Il programma è stato salvato con successo nel database",
-      });
+      showSuccess("Programma salvato", "Il programma è stato salvato con successo nel database");
       // After saving, return to the initial screen
       onSaveComplete();
     }
