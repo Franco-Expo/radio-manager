@@ -15,9 +15,14 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function (toast) {
+        const { id, title, description, action, ...props } = toast;
+        
+        // Ensure id exists (required by Toast component)
+        const toastId = id || `toast-${Math.random().toString(36).substr(2, 9)}`;
+        
         return (
-          <Toast key={id} {...props}>
+          <Toast key={toastId} id={toastId} {...props}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (

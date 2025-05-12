@@ -3,6 +3,7 @@
 import { toast as sonnerToast, type ToastT } from "sonner";
 
 type ToastProps = {
+  id: string;
   title?: string;
   description?: string;
   variant?: "default" | "destructive";
@@ -10,7 +11,7 @@ type ToastProps = {
 };
 
 export function useToast() {
-  function toast({ title, description, variant, action }: ToastProps) {
+  function toast({ title, description, variant, action }: Omit<ToastProps, "id">) {
     switch (variant) {
       case "destructive":
         return sonnerToast.error(title, {
@@ -25,10 +26,11 @@ export function useToast() {
     }
   }
 
-  // We're not actually using these, but we need to return them to match the expected interface
+  // To maintain compatibility, we'll return an empty array with the expected shape
+  // The actual toasts are handled by Sonner directly
   return {
     toast,
-    toasts: [] as ToastT[],
+    toasts: [] as (ToastProps & ToastT)[],
   };
 }
 
