@@ -15,6 +15,8 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   username: z.string().min(3, { message: "Il nome utente deve avere almeno 3 caratteri" }),
@@ -36,6 +38,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -46,6 +49,22 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       confirmPassword: "",
     },
   });
+
+  async function sendConfirmationEmail(email: string, username: string) {
+    try {
+      const { data, error } = await supabase.functions.invoke("send-confirmation-email", {
+        body: { email, username },
+      });
+
+      if (error) {
+        console.error("Error sending confirmation email:", error);
+        // Don't show this error to the user - registration was successful
+      }
+    } catch (error) {
+      console.error("Exception sending confirmation email:", error);
+      // Don't show this error to the user - registration was successful
+    }
+  }
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
@@ -58,6 +77,14 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       setIsLoading(false);
       return;
     }
+
+    // Send confirmation email
+    await sendConfirmationEmail(data.email, data.username);
+
+    toast({
+      title: "Registrazione completata",
+      description: "Ti abbiamo inviato un'email di conferma.",
+    });
 
     if (onSuccess) {
       onSuccess();
