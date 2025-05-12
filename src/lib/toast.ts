@@ -1,5 +1,6 @@
 
 import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export const showSuccess = (title: string, description?: string) => {
   toast.success(title, {
@@ -25,4 +26,5 @@ export const showInfo = (title: string, description?: string) => {
   });
 };
 
-export { toast };
+// Re-export for compatibility
+export { toast, useToast };
