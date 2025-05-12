@@ -1,7 +1,6 @@
 
 // This is a compatibility layer to make existing code work with Sonner
-import { toast as sonnerToast } from "sonner";
-import type { Toast } from "sonner";
+import { toast as sonnerToast, type ToastT } from "sonner";
 
 type ToastProps = {
   title?: string;
@@ -29,7 +28,7 @@ export function useToast() {
   // We're not actually using these, but we need to return them to match the expected interface
   return {
     toast,
-    toasts: [] as Toast[],
+    toasts: [] as ToastT[],
   };
 }
 
