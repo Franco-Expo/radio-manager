@@ -60,8 +60,15 @@ function Calendar({
         Dropdown: ({ value, onChange, children, ...props }: DropdownProps) => {
           const options = React.Children.toArray(children) as React.ReactElement[];
           const selected = options.find(option => option.props.value === value);
-          const handleValueChange = (value: string) => {
-            onChange(value);
+          
+          // Fix: Create a proper event handler that converts the string to the expected format
+          const handleValueChange = (newValue: string) => {
+            // Create a synthetic event object that mimics what onChange expects
+            const syntheticEvent = {
+              target: { value: newValue }
+            } as unknown as React.ChangeEvent<HTMLSelectElement>;
+            
+            onChange(syntheticEvent);
           };
           
           return (
