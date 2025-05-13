@@ -13,21 +13,6 @@ const corsHeaders = {
 interface EmailRequest {
   email: string;
   username: string;
-  resend?: boolean;
-}
-
-// In a real implementation, you would store tokens in a database
-// This is a simplified in-memory storage for demonstration purposes
-const tokenStore: Record<string, { token: string; expires: number }> = {};
-
-// Generate a random 6-character alphanumeric token
-function generateToken(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -37,7 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, username, resend = false }: EmailRequest = await req.json();
+    const { email, username }: EmailRequest = await req.json();
 
     if (!email || !username) {
       return new Response(
@@ -49,42 +34,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Generate a verification token
-    const verificationToken = generateToken();
-    console.log(`Generated verification token for ${email}: ${verificationToken}`);
-
-    // Store the token with a 15-minute expiration
-    tokenStore[email] = {
-      token: verificationToken,
-      expires: Date.now() + 15 * 60 * 1000
-    };
-
-    // For debugging, use a fixed demo token that's always valid
-    const demoToken = "DEMO" + verificationToken.substring(4);
-    console.log(`Demo token for ${email}: ${demoToken}`);
-
-    // If RESEND_API_KEY is not set, return mock response for development
-    if (!Deno.env.get("RESEND_API_KEY")) {
-      console.log("RESEND_API_KEY is not set, returning mock response");
-      return new Response(
-        JSON.stringify({ 
-          id: "mock-email-id",
-          from: "Francesco <francesco@studionet4.com>",
-          to: [email],
-          subject: resend ? "Il tuo nuovo codice di verifica" : "Conferma la tua registrazione",
-          message: `Demo token: ${demoToken}`
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
-      );
-    }
-
     const emailResponse = await resend.emails.send({
       from: "Francesco <francesco@studionet4.com>",
       to: [email],
-      subject: resend ? "Il tuo nuovo codice di verifica" : "Conferma la tua registrazione",
+      subject: "Conferma la tua registrazione",
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333333;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -98,18 +51,12 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             
             <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              Per completare la registrazione, inserisci il seguente codice di verifica:
+              Il tuo account è stato creato con successo. Puoi ora accedere alla piattaforma e iniziare a utilizzare tutti i nostri servizi.
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <div style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 24px; letter-spacing: 5px; font-weight: bold;">
-                ${verificationToken}
-              </div>
+              <a href="#" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 500; display: inline-block;">Accedi alla piattaforma</a>
             </div>
-            
-            <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              Hai problemi a inserire il codice? Per i test, puoi anche usare questo codice demo: ${demoToken}
-            </p>
             
             <p style="font-size: 16px; line-height: 1.5;">
               Se hai domande o hai bisogno di assistenza, non esitare a contattarci.
