@@ -92,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: {
             username,
+            email_verified: false, // Mark as not verified initially
           },
         },
       });
@@ -115,6 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: errorMessage };
       }
 
+      // We successfully registered but need verification
       return { success: true };
     } catch (error: any) {
       return { success: false, error: "Si è verificato un errore imprevisto" };

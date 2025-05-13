@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { VerificationTokenDialog } from "@/components/VerificationTokenDialog";
 
 const formSchema = z.object({
   username: z.string().min(3, { message: "Il nome utente deve avere almeno 3 caratteri" }),
@@ -38,6 +39,8 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showVerification, setShowVerification] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -80,16 +83,45 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
     // Send confirmation email
     await sendConfirmationEmail(data.email, data.username);
+    
+    // Store the email for verification
+    setRegisteredEmail(data.email);
+    
+    // Show verification dialog
+    setShowVerification(true);
+    setIsLoading(false);
+  }
 
+  const handleVerificationSuccess = () => {
+    // Close the verification dialog
+    setShowVerification(false);
+    
+    // Show success message
     toast({
       title: "Registrazione completata",
-      description: "Ti abbiamo inviato un'email di conferma.",
+      description: "Il tuo account è stato verificato e registrato con successo.",
     });
 
+    // Call the original success callback
     if (onSuccess) {
       onSuccess();
     }
-  }
+  };
+
+  const handleVerificationClose = () => {
+    setShowVerification(false);
+    
+    // Show partial success message
+    toast({
+      title: "Registrazione completata",
+      description: "Ti abbiamo inviato un'email di verifica. Completa la verifica per accedere al tuo account.",
+    });
+    
+    // Call the original success callback
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -166,6 +198,13 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           </Button>
         </form>
       </Form>
+
+      <VerificationTokenDialog
+        open={showVerification}
+        onClose={handleVerificationClose}
+        email={registeredEmail}
+        onSuccess={handleVerificationSuccess}
+      />
     </div>
   );
 }

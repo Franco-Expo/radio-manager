@@ -2,4 +2,5 @@
 project_id = "nigarynafypdfqnmjbiy"
 
 [functions.send-confirmation-email]
-verify_jwt = true
+verify_jwt = false
+

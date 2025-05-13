@@ -13,6 +13,17 @@ const corsHeaders = {
 interface EmailRequest {
   email: string;
   username: string;
+  resend?: boolean;
+}
+
+// Generate a random 6-character alphanumeric token
+function generateToken(): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -22,7 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email, username }: EmailRequest = await req.json();
+    const { email, username, resend = false }: EmailRequest = await req.json();
 
     if (!email || !username) {
       return new Response(
@@ -34,10 +45,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Generate a verification token
+    const verificationToken = generateToken();
+    console.log(`Generated verification token for ${email}: ${verificationToken}`);
+
+    // In a real application, you would store this token in the database
+    // associated with the user's account for later verification
+
     const emailResponse = await resend.emails.send({
       from: "Francesco <francesco@studionet4.com>",
       to: [email],
-      subject: "Conferma la tua registrazione",
+      subject: resend ? "Il tuo nuovo codice di verifica" : "Conferma la tua registrazione",
       html: `
         <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333333;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -51,11 +69,13 @@ const handler = async (req: Request): Promise<Response> => {
             </p>
             
             <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
-              Il tuo account è stato creato con successo. Puoi ora accedere alla piattaforma e iniziare a utilizzare tutti i nostri servizi.
+              Per completare la registrazione, inserisci il seguente codice di verifica:
             </p>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="#" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 500; display: inline-block;">Accedi alla piattaforma</a>
+              <div style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 24px; letter-spacing: 5px; font-weight: bold;">
+                ${verificationToken}
+              </div>
             </div>
             
             <p style="font-size: 16px; line-height: 1.5;">
