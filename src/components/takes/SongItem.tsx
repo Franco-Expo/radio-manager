@@ -1,8 +1,18 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrashIcon, Eraser } from "lucide-react";
+import { TrashIcon, Eraser, CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { it } from "date-fns/locale";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 type SongItemProps = {
   id: string;
@@ -37,41 +47,6 @@ export function SongItem({
     }
   };
 
-  // Format date for display in text field
-  const formatDateForInput = (date: Date | null) => {
-    if (!date) return "";
-    // Just return the date as a string
-    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-  };
-
-  // Handle text input change for date
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // If empty, set to null
-    if (!value) {
-      onChange(id, "productionDate", null);
-      return;
-    }
-    
-    // Otherwise create a new date from the input value or store as is
-    try {
-      // Try to create a date if the input is in a valid format
-      const newDate = new Date(value);
-      if (!isNaN(newDate.getTime())) {
-        onChange(id, "productionDate", newDate);
-      } else {
-        // If not a valid date, store the text as is
-        // Since our interface expects a Date or null, we'll need to convert this
-        // to a Date object somehow - using current date as placeholder with the text as note
-        const placeholder = new Date();
-        onChange(id, "productionDate", placeholder);
-      }
-    } catch (error) {
-      console.error("Error parsing date:", error);
-      onChange(id, "productionDate", null);
-    }
-  };
-
   return (
     <div className="space-y-4 p-4 border rounded-md relative">
       <div className="space-y-2">
@@ -86,14 +61,38 @@ export function SongItem({
       
       <div className="space-y-2">
         <Label htmlFor={`production-date-${id}`}>Data di Produzione</Label>
-        <Input
-          id={`production-date-${id}`}
-          type="text"
-          value={formatDateForInput(productionDate)}
-          onChange={handleDateChange}
-          placeholder="Data di produzione"
-          className="w-full"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              id={`production-date-${id}`}
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !productionDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {productionDate ? (
+                format(productionDate, "d MMMM yyyy", { locale: it })
+              ) : (
+                <span>Seleziona una data</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={productionDate || undefined}
+              onSelect={(date) => onChange(id, "productionDate", date)}
+              locale={it}
+              initialFocus
+              captionLayout="dropdown-buttons"
+              fromYear={1900}
+              toYear={new Date().getFullYear()}
+              className="pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
       
       <div className="space-y-2">

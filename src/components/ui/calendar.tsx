@@ -1,9 +1,12 @@
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DropdownProps } from "react-day-picker";
+import { it } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -16,7 +19,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-3 pointer-events-auto", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -54,7 +57,35 @@ function Calendar({
       components={{
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        Dropdown: ({ value, onChange, children, ...props }: DropdownProps) => {
+          const options = React.Children.toArray(children) as React.ReactElement[];
+          const selected = options.find(option => option.props.value === value);
+          const handleValueChange = (value: string) => {
+            onChange(value);
+          };
+          
+          return (
+            <Select
+              value={value?.toString()}
+              onValueChange={handleValueChange}
+            >
+              <SelectTrigger className={cn("w-[var(--rdp-caption-dropdown-width)] border-none shadow-none focus:ring-0 p-1 rounded-sm [&>span]:line-clamp-1 [&>span]:flex [&>span]:items-center [&>span]:truncate [&>span]:px-1 [&>span]:text-sm [&>span]:font-medium", props.className)}>
+                <SelectValue>
+                  {selected?.props?.children}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((option, id: number) => (
+                  <SelectItem key={id} value={option.props.value?.toString() ?? id.toString()}>
+                    {option.props.children}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          );
+        },
       }}
+      locale={it}
       {...props}
     />
   );
