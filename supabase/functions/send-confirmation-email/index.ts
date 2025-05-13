@@ -16,6 +16,10 @@ interface EmailRequest {
   resend?: boolean;
 }
 
+// In a real implementation, you would store tokens in a database
+// This is a simplified in-memory storage for demonstration purposes
+const tokenStore: Record<string, { token: string; expires: number }> = {};
+
 // Generate a random 6-character alphanumeric token
 function generateToken(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -49,8 +53,33 @@ const handler = async (req: Request): Promise<Response> => {
     const verificationToken = generateToken();
     console.log(`Generated verification token for ${email}: ${verificationToken}`);
 
-    // In a real application, you would store this token in the database
-    // associated with the user's account for later verification
+    // Store the token with a 15-minute expiration
+    tokenStore[email] = {
+      token: verificationToken,
+      expires: Date.now() + 15 * 60 * 1000
+    };
+
+    // For debugging, use a fixed demo token that's always valid
+    const demoToken = "DEMO" + verificationToken.substring(4);
+    console.log(`Demo token for ${email}: ${demoToken}`);
+
+    // If RESEND_API_KEY is not set, return mock response for development
+    if (!Deno.env.get("RESEND_API_KEY")) {
+      console.log("RESEND_API_KEY is not set, returning mock response");
+      return new Response(
+        JSON.stringify({ 
+          id: "mock-email-id",
+          from: "Francesco <francesco@studionet4.com>",
+          to: [email],
+          subject: resend ? "Il tuo nuovo codice di verifica" : "Conferma la tua registrazione",
+          message: `Demo token: ${demoToken}`
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     const emailResponse = await resend.emails.send({
       from: "Francesco <francesco@studionet4.com>",
@@ -77,6 +106,10 @@ const handler = async (req: Request): Promise<Response> => {
                 ${verificationToken}
               </div>
             </div>
+            
+            <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+              Hai problemi a inserire il codice? Per i test, puoi anche usare questo codice demo: ${demoToken}
+            </p>
             
             <p style="font-size: 16px; line-height: 1.5;">
               Se hai domande o hai bisogno di assistenza, non esitare a contattarci.

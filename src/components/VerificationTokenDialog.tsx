@@ -44,20 +44,27 @@ export function VerificationTokenDialog({
     setError(null);
 
     try {
-      // Here we would verify the token against the database
-      // For this example, we're simulating a successful verification after a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Verification successful
-      toast({
-        title: "Verifica completata",
-        description: "Il tuo account è stato verificato con successo.",
+      // Call the verification API to check the token
+      const { data, error } = await supabase.functions.invoke("verify-token", {
+        body: { email, token }
       });
+
+      if (error) throw error;
       
-      // Call the success handler
-      onSuccess();
+      if (data?.valid) {
+        // Verification successful
+        toast({
+          title: "Verifica completata",
+          description: "Il tuo account è stato verificato con successo.",
+        });
+        
+        // Call the success handler
+        onSuccess();
+      } else {
+        setError("Token non valido o scaduto. Riprova.");
+      }
     } catch (error: any) {
-      setError("Token non valido o scaduto. Riprova.");
+      setError("Errore durante la verifica. Riprova più tardi.");
       console.error("Verification error:", error);
     } finally {
       setIsLoading(false);
@@ -70,7 +77,7 @@ export function VerificationTokenDialog({
     try {
       // Call the edge function to resend the verification email
       const { error } = await supabase.functions.invoke("send-confirmation-email", {
-        body: { email, resend: true }
+        body: { email, username: email.split("@")[0], resend: true }
       });
 
       if (error) throw error;
